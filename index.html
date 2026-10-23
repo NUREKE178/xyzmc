@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>XYZ — Minecraft сервер | mc.xyzmc.su</title>
+  <meta name="description" content="XYZ — Minecraft сервер с дружным комьюнити, честным донатом и защитой от читеров. IP: mc.xyzmc.su. Заходи и играй!">
+  <meta name="theme-color" content="#0f0f1a">
+  <link rel="canonical" href="https://xyzmc.su/">
+
+  <!-- Open Graph / Twitter -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="XYZ">
+  <meta property="og:locale" content="ru_RU">
+  <meta property="og:title" content="XYZ — Minecraft сервер | mc.xyzmc.su">
+  <meta property="og:description" content="Чувствуй себя как дома. Заходи на mc.xyzmc.su — начни свой путь уже сегодня.">
+  <meta property="og:url" content="https://xyzmc.su/">
+  <meta property="og:image" content="https://xyzmc.su/assets/og.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <link rel="icon" type="image/png" href="assets/favicon.png">
+  <link rel="apple-touch-icon" href="assets/logo.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=Unbounded:wght@500;600;700;800&display=swap&subset=cyrillic" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <script>document.documentElement.classList.add('js');</script>
+</head>
+<body>
+  <a class="skip" href="#main">К содержимому</a>
+  <div class="bg" aria-hidden="true"><div class="bg-glow g1"></div><div class="bg-glow g2"></div><div class="bg-glow g3"></div><div class="bg-cubes" id="cubes"></div></div>
+
+  <!-- ===== Шапка ===== -->
+  <header class="header" id="header">
+    <div class="container header-in">
+      <a class="brand" href="#home" aria-label="XYZ — на главную">
+        <img id="brandLogo" src="assets/logo.png" alt="" width="40" height="40">
+        <span>XYZ</span>
+      </a>
+      <nav class="nav" id="nav" aria-label="Основная навигация"></nav>
+      <div class="header-actions">
+        <a class="icon-btn" id="hTg" target="_blank" rel="noopener" aria-label="Telegram"></a>
+        <a class="icon-btn" id="hDs" target="_blank" rel="noopener" aria-label="Discord"></a>
+        <a class="btn btn-ghost header-cta" id="hCta" target="_blank" rel="noopener"></a>
+        <button class="burger" id="burger" aria-label="Меню" aria-expanded="false" aria-controls="mobileNav"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+    <div class="mobile-nav" id="mobileNav" hidden>
+      <nav class="container" id="mobileLinks" aria-label="Мобильная навигация"></nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- ===== Hero ===== -->
+    <section class="hero container" id="home">
+      <div class="hero-card" id="heroCard">
+        <img class="hero-img" id="heroImg" src="assets/hero.jpg" alt="Блочные персонажи в динамичной сцене — арт сервера XYZ" fetchpriority="high">
+        <div class="hero-shade"></div>
+        <div class="hero-body">
+          <h1 id="heroTitle"></h1>
+          <p id="heroSub"></p>
+          <div class="hero-btns">
+            <a class="btn btn-primary" id="heroPlay" href="#start"></a>
+            <a class="btn btn-glass" id="heroShop" target="_blank" rel="noopener"></a>
+          </div>
+        </div>
+        <div class="online glass" id="online" aria-live="polite">
+          <div class="online-row"><span class="online-label" id="onlineLabel"></span><span class="online-dot" id="onlineDot"></span></div>
+          <div class="bar"><div class="bar-fill" id="barFill"></div></div>
+        </div>
+        <button class="ip-pill glass" id="heroIp" type="button"></button>
+      </div>
+    </section>
+
+    <section class="section container reveal" id="features"></section>
+    <section class="section container reveal" id="modes"></section>
+    <section class="section container reveal" id="news"></section>
+    <section class="section container reveal" id="start"></section>
+    <section class="section container reveal" id="shop"></section>
+    <section class="section container reveal" id="faq"></section>
+    <section class="section container reveal" id="community"></section>
+  </main>
+
+  <footer class="footer" id="footer"></footer>
+
+  <!-- Плавающий чат -->
+  <div class="chat glass" id="chat" hidden role="complementary" aria-label="Помощь">
+    <button class="chat-x" id="chatX" aria-label="Закрыть">×</button>
+    <span id="chatText"></span>
+    <a class="btn btn-ghost btn-sm" id="chatBtn" target="_blank" rel="noopener"></a>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <noscript><p style="text-align:center;padding:24px">Для работы сайта включите JavaScript. Магазин: <a href="https://shop.xyzmc.su">shop.xyzmc.su</a> · IP: mc.xyzmc.su</p></noscript>
+
+  <script src="js/config.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
