@@ -32,11 +32,11 @@ window.XYZ_CONFIG = {
   headerCta: "Перейти к товарам",
 
   hero: {
-    title: "Чувствуй себя как {дома}",
+    version: "Java 1.21+ | Bedrock",          // строка над заголовком
+    title: "Чувствуй себя\n{как дома}",       // \n — перенос, {…} — градиент
     subtitle: "Начните свой путь уже сегодня",
     image: "assets/hero.jpg",
     playButton: "Играть сейчас",
-    shopButton: "Магазин",
   },
 
   features: {
@@ -69,15 +69,17 @@ window.XYZ_CONFIG = {
   },
 
   news: {
-    title: "{Новости}",
-    subtitle: "Последние события и обновления сервера.",
+    title: "Новости {XYZ}",
+    subtitle: "Узнай, что нового!",
     readMore: "Читать далее",
+    moreLabel: "Больше новостей",
+    moreHref: "https://t.me/xyz_nw",
     // Замените тексты, даты и ссылки на реальные. href может вести в Telegram-пост.
     items: [
-      { title: "Открытие сервера XYZ", date: "2026-10-01", image: "assets/news-1.jpg", href: "https://t.me/xyz_nw" },
-      { title: "Большое обновление: что нового", date: "2026-10-10", image: "assets/news-2.jpg", href: "https://t.me/xyz_nw" },
-      { title: "Ивент для всех игроков", date: "2026-10-17", image: "assets/news-3.jpg", href: "https://t.me/xyz_nw" },
-      { title: "Новинки в магазине", date: "2026-10-22", image: "assets/news-4.jpg", href: "https://shop.xyzmc.su" },
+      { title: "Открытие сервера XYZ", date: "2026-10-01", text: "Сервер XYZ распахнул двери. Заходи, находи друзей и начинай свой путь уже сегодня.", image: "assets/news-1.jpg", href: "https://t.me/xyz_nw" },
+      { title: "Большое обновление: что нового", date: "2026-10-10", text: "Рассказываем, что изменилось на сервере: новые возможности, улучшения и исправления.", image: "assets/news-2.jpg", href: "https://t.me/xyz_nw" },
+      { title: "Ивент для всех игроков", date: "2026-10-17", text: "Собираемся вместе на ивент для всех игроков. Следи за анонсами в Telegram и Discord.", image: "assets/news-3.jpg", href: "https://t.me/xyz_nw" },
+      { title: "Новинки в магазине", date: "2026-10-22", text: "В магазине появились новые товары и наборы. Загляни и выбери то, что нужно именно тебе.", image: "assets/news-4.jpg", href: "https://shop.xyzmc.su" },
     ],
   },
 
@@ -121,7 +123,7 @@ window.XYZ_CONFIG = {
   },
 
   chat: {
-    text: "Есть вопросы? Поможем разобраться 🧡",
+    text: "Есть вопросы? Поможем разобраться 💜",
     button: "Написать",
     href: "https://t.me/xyz_nw",
   },
