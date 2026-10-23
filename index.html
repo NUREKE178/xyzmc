@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>XYZ — Minecraft сервер | mc.xyzmc.su</title>
   <meta name="description" content="XYZ — Minecraft сервер с дружным комьюнити, честным донатом и защитой от читеров. IP: mc.xyzmc.su. Заходи и играй!">
-  <meta name="theme-color" content="#0f0f1a">
+  <meta name="theme-color" content="#07070f">
   <link rel="canonical" href="https://xyzmc.su/">
 
   <!-- Open Graph / Twitter -->
@@ -21,21 +21,22 @@
   <link rel="icon" type="image/png" href="assets/favicon.png">
   <link rel="apple-touch-icon" href="assets/logo.png">
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700;800&family=Unbounded:wght@500;600;700;800&display=swap&subset=cyrillic" rel="stylesheet">
+  <link rel="preload" href="assets/fonts/unbounded-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/onest-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="css/fonts.css">
   <link rel="stylesheet" href="css/style.css">
   <script>document.documentElement.classList.add('js');</script>
 </head>
 <body>
   <a class="skip" href="#main">К содержимому</a>
-  <div class="bg" aria-hidden="true"><div class="bg-glow g1"></div><div class="bg-glow g2"></div><div class="bg-glow g3"></div><div class="bg-glow g4"></div><div class="bg-cubes" id="cubes"></div></div>
+  <div class="progress" id="progress" aria-hidden="true"></div>
+  <div class="fx" aria-hidden="true"><div class="glow g1"></div><div class="glow g2"></div><div class="glow g3"></div><div class="glow g4"></div><div class="sparks" id="sparks"></div></div>
 
-  <!-- ===== Шапка: плоская полоса на всю ширину ===== -->
+  <!-- ===== Шапка ===== -->
   <header class="header" id="header">
     <div class="container header-in">
       <a class="brand" href="#home" aria-label="XYZ — на главную">
-        <img id="brandLogo" src="assets/logo.png" alt="" width="40" height="40">
+        <img id="brandLogo" src="assets/logo.png" alt="" width="46" height="46">
         <span>XYZ</span>
       </a>
       <nav class="nav" id="nav" aria-label="Основная навигация"></nav>
@@ -52,12 +53,15 @@
   </header>
 
   <main id="main">
-    <!-- ===== Hero: на всю ширину, по центру ===== -->
+    <!-- ===== Hero ===== -->
     <section class="hero" id="home">
       <img class="hero-img" id="heroImg" src="assets/hero.jpg" alt="" fetchpriority="high">
       <div class="hero-shade"></div>
-      <div class="hero-glow"></div>
+      <div class="hero-rays"></div>
+      <div class="hero-floor"></div>
+      <div class="hero-spot"></div>
       <div class="hero-in container">
+        <div class="emblem"><span class="emblem-halo"></span><img id="emblem" src="assets/logo.png" alt="Логотип XYZ" width="260" height="260"></div>
         <p class="hero-ver" id="heroVer"></p>
         <h1 id="heroTitle"></h1>
         <p class="hero-sub" id="heroSub"></p>
@@ -69,6 +73,8 @@
         <div class="bar"><div class="bar-fill" id="barFill"></div></div>
       </div>
     </section>
+
+    <div class="ticker" id="ticker" aria-hidden="true"></div>
 
     <section class="section reveal" id="features"></section>
     <section class="section reveal" id="modes"></section>
