@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>XYZ — Minecraft сервер | mc.xyzmc.su</title>
   <meta name="description" content="XYZ — Minecraft сервер с дружным комьюнити, честным донатом и защитой от читеров. IP: mc.xyzmc.su. Заходи и играй!">
-  <meta name="theme-color" content="#07070f">
+  <meta name="theme-color" content="#0a0a14">
   <link rel="canonical" href="https://xyzmc.su/">
 
   <!-- Open Graph / Twitter -->
@@ -29,22 +29,20 @@
 </head>
 <body>
   <a class="skip" href="#main">К содержимому</a>
-  <div class="progress" id="progress" aria-hidden="true"></div>
-  <div class="fx" aria-hidden="true"><div class="glow g1"></div><div class="glow g2"></div><div class="glow g3"></div><div class="glow g4"></div><div class="sparks" id="sparks"></div></div>
+  <div class="bg" aria-hidden="true"><div class="bg__blocks" id="blocks"></div></div>
 
-  <!-- ===== Шапка ===== -->
   <header class="header" id="header">
-    <div class="container header-in">
+    <div class="container header__row">
       <a class="brand" href="#home" aria-label="XYZ — на главную">
-        <img id="brandLogo" src="assets/logo.png" alt="" width="46" height="46">
-        <span>XYZ</span>
+        <img class="brand__logo" id="brandLogo" src="assets/logo.png" alt="" width="36" height="36">
+        <span class="brand__name">XYZ</span>
       </a>
       <nav class="nav" id="nav" aria-label="Основная навигация"></nav>
-      <div class="header-actions">
-        <a class="btn header-cta" id="hCta" target="_blank" rel="noopener"></a>
+      <div class="header__actions">
+        <a class="btn header__cta" id="hCta" target="_blank" rel="noopener"></a>
         <a class="icon-btn" id="hTg" target="_blank" rel="noopener" aria-label="Telegram"></a>
         <a class="icon-btn" id="hDs" target="_blank" rel="noopener" aria-label="Discord"></a>
-        <button class="burger" id="burger" aria-label="Меню" aria-expanded="false" aria-controls="mobileNav"><span></span><span></span><span></span></button>
+        <button class="burger" id="burger" type="button" aria-label="Меню" aria-expanded="false" aria-controls="mobileNav"><span></span><span></span><span></span></button>
       </div>
     </div>
     <div class="mobile-nav" id="mobileNav" hidden>
@@ -53,45 +51,36 @@
   </header>
 
   <main id="main">
-    <!-- ===== Hero ===== -->
     <section class="hero" id="home">
-      <img class="hero-img" id="heroImg" src="assets/hero.jpg" alt="" fetchpriority="high">
-      <div class="hero-shade"></div>
-      <div class="hero-rays"></div>
-      <div class="hero-floor"></div>
-      <div class="hero-spot"></div>
-      <div class="hero-in container">
-        <div class="emblem"><span class="emblem-halo"></span><img id="emblem" src="assets/logo.png" alt="Логотип XYZ" width="260" height="260"></div>
-        <p class="hero-ver" id="heroVer"></p>
-        <h1 id="heroTitle"></h1>
-        <p class="hero-sub" id="heroSub"></p>
-        <a class="btn btn-lg" id="heroPlay" href="#start"></a>
-        <button class="ip-pill" id="heroIp" type="button"></button>
+      <img class="hero__img" id="heroImg" src="assets/hero.jpg" alt="" fetchpriority="high">
+      <div class="container hero__inner">
+        <p class="hero__ver" id="heroVer"></p>
+        <h1 class="hero__title" id="heroTitle"></h1>
+        <p class="hero__sub" id="heroSub"></p>
+        <a class="btn btn--lg" id="heroPlay" href="#start"></a>
+        <button class="ip" id="heroIp" type="button"></button>
       </div>
       <div class="online" id="online" aria-live="polite">
-        <div class="online-row"><span class="online-label" id="onlineLabel"></span><span class="online-dot" id="onlineDot"></span></div>
-        <div class="bar"><div class="bar-fill" id="barFill"></div></div>
+        <div class="online__row"><span id="onlineLabel"></span><span class="online__dot" id="onlineDot"></span></div>
+        <div class="online__bar"><div class="online__fill" id="barFill"></div></div>
       </div>
     </section>
 
-    <div class="ticker" id="ticker" aria-hidden="true"></div>
-
     <section class="section reveal" id="features"></section>
-    <section class="section reveal" id="modes"></section>
+    <section class="section section--alt reveal" id="modes"></section>
     <section class="section reveal" id="news"></section>
-    <section class="section reveal" id="start"></section>
+    <section class="section section--alt reveal" id="start"></section>
     <section class="section reveal" id="shop"></section>
-    <section class="section reveal" id="faq"></section>
+    <section class="section section--alt reveal" id="faq"></section>
     <section class="section reveal" id="community"></section>
   </main>
 
   <footer class="footer" id="footer"></footer>
 
-  <!-- Плавающий чат -->
   <div class="chat" id="chat" hidden role="complementary" aria-label="Помощь">
-    <button class="chat-x" id="chatX" aria-label="Закрыть">×</button>
+    <button class="chat__close" id="chatX" type="button" aria-label="Закрыть">×</button>
     <span id="chatText"></span>
-    <a class="btn btn-secondary btn-sm" id="chatBtn" target="_blank" rel="noopener"></a>
+    <a class="btn btn--secondary btn--sm" id="chatBtn" target="_blank" rel="noopener"></a>
   </div>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
