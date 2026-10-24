@@ -278,19 +278,9 @@
     ['home', 'modes', 'news', 'start'].forEach((id) => { const el = document.getElementById(id); if (el) spy.observe(el); });
   }
 
-  function initBlocks() {
-    if (reduceMotion) return;
-    const box = $('#blocks'), count = innerWidth < 700 ? 3 : 6;
-    for (let i = 0; i < count; i++) {
-      const el = document.createElement('i'), size = 14 + Math.random() * 22;
-      el.style.cssText = `left:${8 + Math.random() * 84}%;width:${size}px;height:${size}px;animation-duration:${40 + Math.random() * 30}s;animation-delay:-${Math.random() * 60}s`;
-      box.appendChild(el);
-    }
-  }
-
   /* ================= Запуск ================= */
   renderChrome();
   initOnline();
   renderFeatures(); renderModes(); renderNews(); renderStart(); renderShop(); renderFaq(); renderCommunity(); renderFooter();
-  initChat(); initHeader(); initObservers(); initBlocks();
+  initChat(); initHeader(); initObservers();
 })();
