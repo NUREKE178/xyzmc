@@ -52,7 +52,7 @@
   /* ================= Шаблоны блоков ================= */
   const label = (text, ic) => `<span>${esc(text)}</span>${ic ? icon(ic) : ''}`;            // подпись кнопки + иконка справа
   const section = (html, mod = '') => `<section class="section ${mod} reveal"><div class="container">${html}</div></section>`;
-  const head = (title, sub) => `<header class="head"><h2 class="head__title">${rich(title)}</h2>${sub ? `<p class="head__sub">${esc(sub)}</p>` : ''}</header>`;
+  const head = (title, sub) => `<header class="head"><h2 class="head__title" data-anim>${rich(title)}</h2>${sub ? `<p class="head__sub" data-anim style="--d:.12s">${esc(sub)}</p>` : ''}</header>`;
 
   // Шапка внутренней страницы: хлебные крошки + заголовок (как у страницы правил)
   const pageHero = ({ crumb, title, subtitle }) => `
@@ -67,9 +67,9 @@
 
   // Баннер: панель с персонажем и текстом. Чётные — арт слева, нечётные — справа.
   const banner = (b, i = 0) => `
-    <article class="banner banner--${esc(b.tone || 'violet')}${i % 2 ? ' banner--flip' : ''}">
+    <article class="banner banner--${esc(b.tone || 'violet')}${i % 2 ? ' banner--flip' : ''}" data-anim style="--d:${(i * 0.12).toFixed(2)}s">
       <div class="banner__panel">
-        <img class="banner__art" src="${esc(b.image)}" alt="" aria-hidden="true" loading="lazy" width="392" height="490">
+        <div class="banner__figure"><img class="banner__art" src="${esc(b.image)}" alt="" aria-hidden="true" loading="lazy" width="392" height="490"></div>
         <div class="banner__body">
           <h3 class="banner__title">${esc(b.title)}</h3>
           <p class="banner__text">${esc(b.text)}</p>
@@ -167,6 +167,14 @@
     $('#chatX').onclick = () => { chat.hidden = true; storage.set('xyz-chat-closed', '1'); };
   }
 
+  // Шапка получает тень и плотный фон после прокрутки
+  function watchScroll() {
+    const header = $('#header');
+    const update = () => header.classList.toggle('scrolled', scrollY > 8);
+    addEventListener('scroll', update, { passive: true });
+    update();
+  }
+
   // Плавное появление секций; вызывается страницей после отрисовки
   function reveal() {
     const items = $$('.reveal');
@@ -183,4 +191,5 @@
   renderHeader();
   renderFooter();
   renderOverlays();
+  watchScroll();
 })();
