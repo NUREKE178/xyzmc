@@ -20,6 +20,7 @@
 
   <link rel="icon" type="image/png" href="assets/favicon.png">
   <link rel="apple-touch-icon" href="assets/logo.png">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"XYZ","url":"https://xyzmc.su/","description":"Minecraft сервер XYZ — mc.xyzmc.su"}</script>
 
   <link rel="preload" href="assets/fonts/unbounded-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/onest-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
@@ -27,67 +28,17 @@
   <link rel="stylesheet" href="css/style.css">
   <script>document.documentElement.classList.add('js');</script>
 </head>
-<body>
+<body data-page="home">
   <a class="skip" href="#main">К содержимому</a>
   <div class="bg" aria-hidden="true"></div>
-
-  <header class="header" id="header">
-    <div class="container header__row">
-      <a class="brand" href="#home" aria-label="XYZ — на главную">
-        <img class="brand__logo" id="brandLogo" src="assets/logo.png" alt="" width="36" height="36">
-        <span class="brand__name">XYZ</span>
-      </a>
-      <nav class="nav" id="nav" aria-label="Основная навигация"></nav>
-      <div class="header__actions">
-        <a class="btn header__cta" id="hCta" target="_blank" rel="noopener"></a>
-        <a class="icon-btn" id="hTg" target="_blank" rel="noopener" aria-label="Telegram"></a>
-        <a class="icon-btn" id="hDs" target="_blank" rel="noopener" aria-label="Discord"></a>
-        <button class="burger" id="burger" type="button" aria-label="Меню" aria-expanded="false" aria-controls="mobileNav"><span></span><span></span><span></span></button>
-      </div>
-    </div>
-    <div class="mobile-nav" id="mobileNav" hidden>
-      <nav class="container" id="mobileLinks" aria-label="Мобильная навигация"></nav>
-    </div>
-  </header>
-
-  <main id="main">
-    <section class="hero" id="home">
-      <img class="hero__img" id="heroImg" src="assets/hero.jpg" alt="" fetchpriority="high">
-      <div class="container hero__inner">
-        <p class="hero__ver" id="heroVer"></p>
-        <h1 class="hero__title" id="heroTitle"></h1>
-        <p class="hero__sub" id="heroSub"></p>
-        <a class="btn btn--lg" id="heroPlay" href="#start"></a>
-        <button class="ip" id="heroIp" type="button"></button>
-      </div>
-      <div class="online" id="online" aria-live="polite">
-        <div class="online__row"><span id="onlineLabel"></span><span class="online__dot" id="onlineDot"></span></div>
-        <div class="online__bar"><div class="online__fill" id="barFill"></div></div>
-      </div>
-    </section>
-
-    <section class="section reveal" id="features"></section>
-    <section class="section section--alt reveal" id="modes"></section>
-    <section class="section reveal" id="news"></section>
-    <section class="section section--alt reveal" id="start"></section>
-    <section class="section reveal" id="shop"></section>
-    <section class="section section--alt reveal" id="faq"></section>
-    <section class="section reveal" id="community"></section>
-  </main>
-
+  <header class="header" id="header"></header>
+  <main id="main"></main>
   <footer class="footer" id="footer"></footer>
-
-  <div class="chat" id="chat" hidden role="complementary" aria-label="Помощь">
-    <button class="chat__close" id="chatX" type="button" aria-label="Закрыть">×</button>
-    <span id="chatText"></span>
-    <a class="btn btn--secondary btn--sm" id="chatBtn" target="_blank" rel="noopener"></a>
-  </div>
-
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <noscript><p style="text-align:center;padding:24px">Для работы сайта включите JavaScript. Магазин: <a href="https://shop.xyzmc.su">shop.xyzmc.su</a> · IP: mc.xyzmc.su</p></noscript>
 
   <script src="js/config.js"></script>
-  <script src="js/main.js"></script>
+  <script src="js/core.js"></script>
+  <script src="js/pages/home.js"></script>
 </body>
 </html>

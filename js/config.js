@@ -1,8 +1,8 @@
 /**
  * XYZ — единый файл настроек сайта.
- * Здесь ВСЕ ссылки, IP, тексты и списки карточек. Правьте только этот файл,
- * чтобы поменять содержимое. Выделение цветом: слово в {фигурных скобках}
- * в заголовках станет фиолетовым градиентом.
+ * Здесь ВСЕ ссылки, IP, тексты, команда и списки карточек. Чтобы изменить
+ * содержимое, правьте только этот файл. Слово в {фигурных скобках} в заголовке
+ * подсвечивается акцентным цветом, \n — перенос строки.
  *
  * Иконки (поле `icon`): shield, users, refresh, coin, lock, support,
  * server, sword, telegram, discord, bag, copy, play, home.
@@ -14,31 +14,41 @@ window.XYZ_CONFIG = {
     shopUrl: "https://shop.xyzmc.su",
     discordUrl: "https://discord.gg/yKkcFfgZ6b",
     telegramUrl: "https://t.me/xyz_nw",
-    // API для онлайна. Если не ответит — виджет покажет «Статус недоступен».
-    statusApi: "https://api.mcsrvstat.us/3/mc.xyzmc.su",
-    fallbackMaxPlayers: 100,
     year: 2026,
     logo: "assets/logo.png",
   },
 
+  // Меню. `page` — какая страница подсвечивается как активная.
   nav: [
-    { label: "Главная", href: "#home" },
-    { label: "Режимы", href: "#modes" },
-    { label: "Новости", href: "#news" },
+    { label: "Главная", href: "index.html", page: "home" },
+    { label: "Новости", href: "index.html#news" },
+    { label: "Играть", href: "play.html", page: "play" },
+    { label: "Команда", href: "team.html", page: "team" },
+    { label: "FAQ", href: "faq.html", page: "faq" },
     { label: "Магазин", href: "https://shop.xyzmc.su", external: true },
-    { label: "Как играть", href: "#start" },
   ],
 
-  headerCta: "Перейти к товарам",
+  // Кнопка в шапке копирует IP
+  headerCta: "Скопировать IP",
+
+  // Заголовки внутренних страниц (шапка страницы с хлебными крошками)
+  pages: {
+    play: { crumb: "Играть", title: "Играть на {XYZ}", subtitle: "Всё, что нужно, чтобы зайти на сервер и начать игру." },
+    team: { crumb: "Команда", title: "Команда {XYZ}", subtitle: "Люди, которые поддерживают сервер." },
+    faq: { crumb: "FAQ", title: "Вопросы и {ответы}", subtitle: "Коротко о входе, покупках и правилах сервера." },
+    homeCrumb: "Главная",
+  },
 
   hero: {
     version: "Java 1.21+ | Bedrock",          // строка над заголовком
-    title: "Чувствуй себя\n{как дома}",       // \n — перенос, {…} — градиент
+    title: "Чувствуй себя\n{как дома}",
     subtitle: "Начните свой путь уже сегодня",
     image: "assets/hero.jpg",
     playButton: "Играть сейчас",
+    playHref: "play.html",
   },
 
+  // ---------- Страница «Играть» ----------
   features: {
     title: "Почему {XYZ}",
     subtitle: "Всё, что нужно для комфортной игры — без лишнего.",
@@ -68,6 +78,18 @@ window.XYZ_CONFIG = {
     ],
   },
 
+  start: {
+    title: "Как начать {играть}",
+    subtitle: "Три простых шага — и вы на сервере.",
+    steps: [
+      { title: "Открой Minecraft", text: "Запусти игру нужной версии и перейди в «Сетевая игра»." },
+      { title: "Добавь сервер", text: "Нажми «Добавить сервер» и вставь адрес:", showIp: true },
+      { title: "Заходи и играй", text: "Выбери XYZ в списке, зайди и начни своё приключение." },
+    ],
+    copyLabel: "Скопировать IP",
+  },
+
+  // ---------- Главная: новости ----------
   news: {
     title: "Новости {XYZ}",
     subtitle: "Узнай, что нового!",
@@ -83,42 +105,43 @@ window.XYZ_CONFIG = {
     ],
   },
 
-  start: {
-    id: "start",
-    title: "Как начать {играть}",
-    subtitle: "Три простых шага — и вы на сервере.",
-    steps: [
-      { title: "Открой Minecraft", text: "Запусти игру нужной версии и перейди в «Сетевая игра»." },
-      { title: "Добавь сервер", text: "Нажми «Добавить сервер» и вставь адрес:" , showIp: true },
-      { title: "Заходи и играй", text: "Выбери XYZ в списке, зайди и начни своё приключение." },
+  // ---------- Баннеры под новостями (и на странице FAQ) ----------
+  // image — PNG персонажа с прозрачным фоном (сейчас заглушки). tone: violet | indigo | plum.
+  banners: {
+    items: [
+      { id: "shop", tone: "violet", title: "Магазин", text: "Привилегии, наборы и другие товары для комфортной игры на сервере.", button: "Перейти в магазин", icon: "bag", href: "https://shop.xyzmc.su", image: "assets/banner-shop.png" },
+      { id: "discord", tone: "indigo", title: "Discord", text: "Чат игроков, правила, поддержка и анонсы ивентов.", button: "Вступить в Discord", icon: "discord", href: "https://discord.gg/yKkcFfgZ6b", image: "assets/banner-discord.png" },
+      { id: "telegram", tone: "plum", title: "Telegram", text: "Свежие новости сервера и быстрая связь с командой.", button: "Открыть Telegram", icon: "telegram", href: "https://t.me/xyz_nw", image: "assets/banner-telegram.png" },
     ],
-    copyLabel: "Скопировать IP",
   },
 
-  shop: {
-    title: "Магазин XYZ",
-    text: "Привилегии, наборы и другие товары для комфортной игры на сервере.",
-    button: "Перейти в магазин",
+  // ---------- Страница «Команда» ----------
+  // Скин подтягивается по нику (`nick`). Если ника нет — показывается заглушка.
+  // Чтобы добавить человека — скопируйте строку. `highlight: true` выделяет роль.
+  team: {
+    skinUrl: "https://minotar.net/armor/bust/{nick}/240.png",       // основной сервис скинов
+    skinFallbackUrl: "https://mc-heads.net/avatar/{nick}/240",      // запасной
+    placeholder: "assets/skin-placeholder.png",
+    members: [
+      { name: "ARDI", nick: "ArdiGOI", role: "Владелец", highlight: true },
+      { name: "NClayer", nick: "NClayer", role: "Владелец", highlight: true },
+      { name: "KHnurlan", nick: "KHnurlan", role: "Тех. разработчик" },
+      { name: "Имя уточняется", nick: "", role: "Куратор" },
+    ],
   },
 
+  // ---------- Страница FAQ ----------
   faq: {
     title: "Частые {вопросы}",
+    moreTitle: "Остались {вопросы}?",
+    moreSubtitle: "Напишите нам — поможем разобраться.",
     items: [
       { q: "На какой версии Minecraft играть?", a: "Укажите актуальную версию сервера здесь. Рекомендуем использовать последнюю стабильную версию Minecraft Java Edition." },
       { q: "Как зайти на сервер?", a: "Откройте Minecraft → «Сетевая игра» → «Добавить сервер» и введите адрес mc.xyzmc.su. Затем выберите сервер в списке и нажмите «Подключиться»." },
       { q: "Как купить привилегию или товар?", a: "Перейдите в магазин shop.xyzmc.su, выберите товар, укажите свой игровой ник и оплатите удобным способом. Товар выдаётся автоматически." },
-      { q: "Как связаться с поддержкой?", a: "Напишите нам в Telegram или Discord — ссылки есть в разделе «Сообщество» и в подвале сайта." },
+      { q: "Как связаться с поддержкой?", a: "Напишите нам в Telegram или Discord — ссылки есть на баннерах и в подвале сайта." },
       { q: "Где посмотреть правила?", a: "Правила сервера опубликованы в нашем Discord. Пожалуйста, ознакомьтесь с ними перед началом игры." },
       { q: "Что делать, если сервер не подключается?", a: "Проверьте адрес и версию игры, перезапустите клиент. Если проблема остаётся — напишите в поддержку." },
-    ],
-  },
-
-  community: {
-    title: "Присоединяйся к {сообществу}",
-    subtitle: "Новости, ивенты, помощь и общение — в наших каналах.",
-    items: [
-      { icon: "discord", title: "Discord", text: "Чат игроков, правила, поддержка и анонсы ивентов.", button: "Вступить в Discord", href: "https://discord.gg/yKkcFfgZ6b", color: "discord" },
-      { icon: "telegram", title: "Telegram", text: "Свежие новости сервера и быстрая связь с командой.", button: "Открыть Telegram", href: "https://t.me/xyz_nw", color: "telegram" },
     ],
   },
 
@@ -138,9 +161,5 @@ window.XYZ_CONFIG = {
   texts: {
     copied: "Скопировано!",
     copyFailed: "Не удалось скопировать — IP: ",
-    online: "Онлайн",
-    offline: "Сервер офлайн",
-    unavailable: "Статус недоступен",
-    loading: "Загрузка…",
   },
 };
