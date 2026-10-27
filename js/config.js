@@ -40,7 +40,7 @@ window.XYZ_CONFIG = {
   },
 
   hero: {
-    version: "Java 1.21+ | Bedrock",          // строка над заголовком
+    version: "Java 1.21+",          // строка над заголовком
     title: "Чувствуй себя\n{как дома}",
     subtitle: "Начните свой путь уже сегодня",
     image: "assets/hero.jpg",
