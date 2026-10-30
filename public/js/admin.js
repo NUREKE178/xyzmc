@@ -35,7 +35,12 @@
     });
     const data = await res.json().catch(() => ({}));
     if (res.status === 401 && path !== 'login') { renderLogin('Сессия истекла — войдите снова.'); throw new Error('Требуется вход'); }
-    if (!res.ok) throw new Error(data.error || `Ошибка ${res.status}`);
+    if (!res.ok) {
+      console.error('[API]', method, '/api/' + path, res.status, data);       // подробности — в консоль браузера
+      const err = new Error(data.error || `Ошибка ${res.status}`);
+      if (res.status >= 500 && path !== 'diagnostics') setTimeout(() => showDiagnostics(`${method} /api/${path} → ${res.status}: ${err.message}`), 0);
+      throw err;
+    }
     return data;
   }
 
@@ -163,23 +168,34 @@
   const storageNote = () => state.storage === 'missing'
     ? '<p class="adm-note adm-note--warn">Хранилище не подключено, поэтому сохранить изменения пока нельзя. В Vercel откройте Storage → ваш Blob → Connect Project, затем сделайте Redeploy. Нажмите «Проверить хранилище» слева, чтобы убедиться.</p>' : '';
 
-  async function showDiagnostics() {
+  let diagOpen = false;
+  async function showDiagnostics(failure = '') {
+    if (diagOpen) return;
+    diagOpen = true;
     const dlg = document.createElement('dialog');
     dlg.className = 'adm-dialog adm-dialog--sm';
-    dlg.innerHTML = '<div class="adm-dialog__box"><h2>Проверка хранилища</h2><p class="adm-lead" style="margin:0" id="diagBody">Проверяем запись и чтение…</p><div class="adm-dialog__foot"><button class="btn" type="button" data-close><span>Закрыть</span></button></div></div>';
+    dlg.innerHTML = `<div class="adm-dialog__box"><h2>${failure ? 'Не удалось сохранить' : 'Проверка хранилища'}</h2>
+      ${failure ? `<p class="adm-error" style="min-height:0">${esc(failure)}</p>` : ''}
+      <p class="adm-lead" style="margin:0" id="diagBody">Проверяем запись и чтение…</p>
+      <div class="adm-dialog__foot"><button class="btn btn--secondary" type="button" id="diagCopy" hidden><span>Скопировать отчёт</span></button><button class="btn" type="button" data-close><span>Закрыть</span></button></div></div>`;
     document.body.appendChild(dlg);
     dlg.addEventListener('click', (e) => { if (e.target === dlg || e.target.closest('[data-close]')) dlg.close(); });
-    dlg.addEventListener('close', () => dlg.remove());
+    dlg.addEventListener('close', () => { diagOpen = false; dlg.remove(); });
     dlg.showModal();
     const body = $('#diagBody', dlg);
+    let report = `XYZ admin report\n${new Date().toISOString()}\n${location.origin}\n${failure ? 'Ошибка: ' + failure + '\n' : ''}`;
     try {
       const d = await api('diagnostics');
-      const mark = (r) => (r && r.ok ? '✓ работает' : `✗ ${esc(r?.error || 'не проверено')}`);
+      const mark = (r) => (r && r.ok ? 'работает' : `ОШИБКА: ${r?.error || 'не проверено'}`);
       body.innerHTML = `<b>Режим:</b> ${d.mode === 'vercel-blob' ? 'Vercel Blob' : 'файлы на сервере'}<br>
-        <b>Доступ к Blob:</b> ${d.credentials ? esc(d.credentials) : 'не найден'}<br>
-        <b>Запись:</b> ${mark(d.write)}<br><b>Чтение:</b> ${mark(d.read)}
-        ${d.hint ? `<br><br><span style="color:#ffd3de">${esc(d.hint)}</span>` : (d.write?.ok && d.read?.ok ? '<br><br>Всё в порядке — сохранение должно работать.' : '')}`;
-    } catch (e) { body.textContent = e.message; }
+        <b>Доступ к Blob:</b> ${d.credentials ? esc(d.credentials) : 'не найден'}${d.access ? ` (${esc(d.access)})` : ''}<br>
+        <b>Запись:</b> ${esc(mark(d.write))}<br><b>Чтение:</b> ${esc(mark(d.read))}
+        ${d.hint ? `<br><br><span style="color:#ffd3de">${esc(d.hint)}</span>` : (d.write?.ok && d.read?.ok ? '<br><br>Хранилище работает. Если ошибка повторяется — скопируйте отчёт и отправьте разработчику.' : '')}`;
+      report += `Режим: ${d.mode}\nДоступ: ${d.credentials || 'нет'} ${d.access || ''}\nЗапись: ${mark(d.write)}\nЧтение: ${mark(d.read)}\n${d.hint ? 'Подсказка: ' + d.hint + '\n' : ''}`;
+    } catch (e) { body.textContent = e.message; report += `Диагностика не выполнена: ${e.message}\n`; }
+    const copy = $('#diagCopy', dlg);
+    copy.hidden = false;
+    copy.addEventListener('click', async () => { try { await navigator.clipboard.writeText(report); copy.firstElementChild.textContent = 'Скопировано'; } catch (e) { copy.firstElementChild.textContent = 'Не удалось'; } });
   }
 
   /* ================= Новости ================= */
