@@ -1,0 +1,117 @@
+/* ==========================================================
+   Админ-панель XYZ. Использует токены и кнопки из style.css.
+   ========================================================== */
+.adm { min-height: 100vh; }
+.adm-login { display: grid; place-items: center; min-height: 100vh; padding: 24px; }
+.adm-login__box { width: 100%; max-width: 400px; padding: 36px 32px 32px; border: 1px solid var(--line-2); border-radius: var(--r-lg); background: var(--surface); box-shadow: var(--shadow-lg); text-align: center; }
+.adm-login__box img { width: 64px; height: 64px; margin: 0 auto 14px; }
+.adm-login__box h1 { font-size: 22px; }
+.adm-login__box p { margin-top: 8px; color: var(--muted); font-size: 15px; }
+.adm-login__box form { display: grid; gap: 14px; margin-top: 24px; text-align: left; }
+.adm-error { min-height: 20px; color: #f2a0b3; font-size: 14px; }
+
+/* Каркас: боковая панель + контент */
+.adm-shell { display: grid; grid-template-columns: 250px 1fr; min-height: 100vh; }
+.adm-side { position: sticky; top: 0; display: flex; flex-direction: column; gap: 24px; height: 100vh; padding: 24px 18px; border-right: 1px solid var(--line); background: #130f1b; }
+.adm-side .brand { padding: 0 8px; }
+.adm-tabs { display: grid; gap: 6px; }
+.adm-tab { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 1px solid transparent; border-radius: var(--r-md); background: transparent; color: #bdb6d2; font: 600 15px var(--font-body); text-align: left; transition: background-color .2s, color .2s; }
+.adm-tab:hover { background: var(--surface); color: #fff; }
+.adm-tab[aria-selected="true"] { border-color: var(--line-2); background: var(--surface); color: #fff; }
+.adm-tab .ico { width: 19px; height: 19px; color: var(--violet-hi); }
+.adm-side__foot { display: grid; gap: 8px; margin-top: auto; }
+.adm-side__foot a, .adm-side__foot button { display: block; width: 100%; padding: 10px 14px; border: 1px solid var(--line); border-radius: var(--r-md); background: transparent; color: var(--muted); font: 500 14px var(--font-body); text-align: left; transition: color .2s, border-color .2s; }
+.adm-side__foot a:hover, .adm-side__foot button:hover { color: #fff; border-color: var(--line-2); }
+.adm-main { width: 100%; max-width: 1040px; padding: 36px clamp(18px, 4vw, 48px) 120px; }
+.adm-title { font: 500 28px/1.2 var(--font-display); }
+.adm-lead { margin: 8px 0 26px; color: var(--muted); font-size: 16px; }
+.adm-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 22px; }
+.adm-note { margin-bottom: 20px; padding: 14px 18px; border: 1px solid var(--accent-line); border-radius: var(--r-md); background: rgba(124, 79, 224, .1); color: #d9ccff; font-size: 15px; }
+
+/* Поля */
+.adm-field { display: grid; gap: 7px; }
+.adm-field > span, .adm-label { color: #cfc8e2; font-size: 14px; font-weight: 600; }
+.adm-hint { color: var(--muted); font-size: 13px; font-weight: 400; }
+.adm-input, .adm-textarea { width: 100%; padding: 12px 14px; border: 1px solid var(--line-2); border-radius: var(--r-md); background: var(--bg); color: var(--text); font-size: 16px; transition: border-color .2s; }
+.adm-textarea { min-height: 220px; resize: vertical; line-height: 1.6; }
+.adm-input:focus, .adm-textarea:focus { outline: none; border-color: var(--violet-hi); }
+.adm-check { display: flex; align-items: center; gap: 10px; color: #d9d3e8; font-size: 15px; cursor: pointer; }
+.adm-check input { width: 18px; height: 18px; accent-color: var(--violet); }
+
+/* Списки */
+.adm-list { display: grid; gap: 12px; }
+.adm-item { display: grid; grid-template-columns: 96px 1fr auto; align-items: center; gap: 18px; padding: 12px 16px 12px 12px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); box-shadow: var(--shadow-sm); }
+.adm-thumb { width: 96px; height: 62px; border-radius: 10px; background: var(--surface-2); object-fit: cover; }
+.adm-item__title { font-size: 16.5px; font-weight: 600; line-height: 1.35; overflow-wrap: anywhere; }
+.adm-item__meta { margin-top: 2px; color: var(--muted); font-size: 14px; }
+.adm-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+.adm-empty { padding: 48px 20px; border: 1px dashed var(--line-2); border-radius: 14px; color: var(--muted); text-align: center; }
+.btn--danger { color: #f4b6c4; }
+.btn--danger:hover { background: #4a2433; }
+
+/* Команда */
+.adm-team { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+.adm-member { display: grid; gap: 14px; padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); box-shadow: var(--shadow-sm); }
+.adm-member__top { display: flex; align-items: center; gap: 16px; }
+.adm-avatar { display: grid; place-items: end center; width: 92px; height: 92px; flex: none; overflow: hidden; border-radius: 12px; background: var(--surface-2); }
+.adm-avatar img { width: 82%; height: auto; image-rendering: pixelated; }
+.adm-avatar img.is-photo { width: 100%; height: 100%; object-fit: cover; image-rendering: auto; }
+.adm-member__btns { display: grid; gap: 8px; }
+.adm-member__foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-top: 12px; border-top: 1px solid var(--line); }
+.adm-order { display: flex; gap: 6px; }
+.adm-order .btn { padding: 8px 12px 6px; }
+
+/* Главный экран */
+.adm-radios { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 22px; }
+.adm-radio { position: relative; display: block; padding: 16px 16px 16px 46px; border: 1px solid var(--line-2); border-radius: 14px; background: var(--surface); cursor: pointer; transition: border-color .2s; }
+.adm-radio input { position: absolute; left: 16px; top: 18px; width: 18px; height: 18px; accent-color: var(--violet); }
+.adm-radio b { display: block; font-size: 16px; }
+.adm-radio span { display: block; margin-top: 2px; color: var(--muted); font-size: 13.5px; line-height: 1.45; }
+.adm-radio:has(input:checked) { border-color: var(--violet-hi); background: #2b2340; }
+.adm-panel { display: grid; gap: 16px; padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); }
+.adm-preview { overflow: hidden; border: 1px solid var(--line-2); border-radius: 12px; background: var(--bg); aspect-ratio: 16 / 7; }
+.adm-preview img, .adm-preview video { width: 100%; height: 100%; object-fit: cover; }
+.adm-preview__empty { display: grid; place-items: center; height: 100%; color: var(--muted); font-size: 15px; }
+.adm-filebar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.adm-filebar input[type="file"] { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+.adm-filename { color: var(--muted); font-size: 14px; overflow-wrap: anywhere; }
+
+/* Панель сохранения */
+.adm-savebar { position: fixed; left: 250px; right: 0; bottom: 0; z-index: 20; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px clamp(18px, 4vw, 48px); border-top: 1px solid var(--line-2); background: rgba(27, 22, 38, .96); backdrop-filter: blur(10px); }
+.adm-savebar__status { color: var(--muted); font-size: 15px; }
+.adm-savebar__status.is-dirty { color: #e3d9ff; }
+
+/* Диалоги */
+.adm-dialog { width: 100%; max-width: min(760px, calc(100% - 24px)); margin: auto; padding: 0; border: 0; background: transparent; color: inherit; overflow: visible; }
+.adm-dialog::backdrop { background: rgba(10, 7, 16, .76); backdrop-filter: blur(4px); }
+.adm-dialog[open] { animation: modal-in .25s cubic-bezier(.2, .8, .2, 1); }
+.adm-dialog__box { display: grid; gap: 18px; max-height: calc(100vh - 32px); padding: 28px; overflow: auto; border: 1px solid var(--line-2); border-radius: var(--r-lg); background: var(--surface); box-shadow: var(--shadow-lg); }
+.adm-dialog__box h2 { font-size: 22px; }
+.adm-dialog--sm { max-width: min(420px, calc(100% - 24px)); }
+.adm-dialog__foot { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; }
+.adm-cover { display: flex; align-items: center; gap: 16px; }
+.adm-cover .adm-thumb { width: 140px; height: 90px; }
+
+/* Уведомление */
+.adm-toast { position: fixed; left: 50%; bottom: 84px; z-index: 90; max-width: calc(100% - 32px); padding: 12px 20px; border: 1px solid var(--line-2); border-radius: var(--r-md); background: var(--surface-2); box-shadow: var(--shadow-md); font-size: 15px; opacity: 0; pointer-events: none; transform: translate(-50%, 12px); transition: opacity .25s, transform .25s; }
+.adm-toast.show { opacity: 1; transform: translate(-50%, 0); }
+.adm-toast.is-error { border-color: rgba(242, 140, 165, .5); color: #ffd3de; }
+.btn[disabled] { opacity: .55; pointer-events: none; }
+
+@media (max-width: 900px) {
+  .adm-shell { grid-template-columns: 1fr; }
+  .adm-side { position: static; flex-direction: row; flex-wrap: wrap; align-items: center; height: auto; padding: 14px 16px; border-right: 0; border-bottom: 1px solid var(--line); }
+  .adm-tabs { display: flex; flex: 1 1 100%; order: 3; gap: 6px; overflow-x: auto; }
+  .adm-tab { flex: none; padding: 10px 14px; }
+  .adm-side__foot { flex-direction: row; margin: 0 0 0 auto; }
+  .adm-side__foot a, .adm-side__foot button { width: auto; }
+  .adm-savebar { left: 0; }
+  .adm-radios { grid-template-columns: 1fr; }
+}
+@media (max-width: 560px) {
+  .adm-item { grid-template-columns: 72px 1fr; }
+  .adm-thumb { width: 72px; height: 52px; }
+  .adm-actions { grid-column: 1 / -1; justify-content: flex-start; }
+  .adm-dialog__box { padding: 22px 18px; }
+  .adm-cover { flex-direction: column; align-items: flex-start; }
+}

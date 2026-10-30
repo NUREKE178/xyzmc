@@ -1,14 +1,14 @@
 /**
- * «Играть»: Почему XYZ → Режимы сервера → Как начать играть.
+ * «О сервере»: Почему XYZ → Режимы сервера → Как начать играть.
  */
 (function () {
   'use strict';
-  const { C, S, $, esc, label, section, head, icon, pageHero, reveal } = window.XYZ;
+  const { C, S, $, esc, label, section, head, icon, pageHero, animate } = window.XYZ;
 
   const F = C.features;
   const features = section(`${head(F.title, F.subtitle)}
-    <ul class="features">${F.items.map((f, i) => `
-      <li class="card feature" style="--i:${i}"><span class="tile">${icon(f.icon)}</span><h3 class="card__title">${esc(f.title)}</h3><p class="card__text">${esc(f.text)}</p></li>`).join('')}
+    <ul class="features">${F.items.map((f) => `
+      <li class="card feature"><span class="tile">${icon(f.icon)}</span><h3 class="card__title">${esc(f.title)}</h3><p class="card__text">${esc(f.text)}</p></li>`).join('')}
     </ul>`);
 
   const M = C.modes;
@@ -27,10 +27,10 @@
   const T = C.start;
   const start = section(`<div id="start">${head(T.title, T.subtitle)}
     <ol class="steps">${T.steps.map((s, i) => `
-      <li class="card step" style="--i:${i}"><span class="step__n" aria-hidden="true">${i + 1}</span><h3 class="card__title">${esc(s.title)}</h3><p class="card__text">${esc(s.text)}</p>${s.showIp ? `<code class="ip-code">${esc(S.ip)}</code>` : ''}</li>`).join('')}
+      <li class="card step"><span class="step__n" aria-hidden="true">${i + 1}</span><h3 class="card__title">${esc(s.title)}</h3><p class="card__text">${esc(s.text)}</p>${s.showIp ? `<code class="ip-code">${esc(S.ip)}</code>` : ''}</li>`).join('')}
     </ol>
     <div class="center"><button class="btn btn--lg" type="button" data-copy="${esc(S.ip)}">${label(`${T.copyLabel} · ${S.ip}`, 'copy')}</button></div></div>`);
 
-  $('#main').innerHTML = pageHero(C.pages.play) + features + modes + start;
-  reveal();
+  $('#main').innerHTML = pageHero({ current: C.pages.play.crumb, title: C.pages.play.title, subtitle: C.pages.play.subtitle }) + features + modes + start;
+  animate();
 })();
