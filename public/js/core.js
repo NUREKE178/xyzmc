@@ -242,9 +242,6 @@
     panel.addEventListener('click', (e) => { if (e.target.closest('a')) toggle(false); });
     addEventListener('keydown', (e) => { if (e.key === 'Escape') toggle(false); });
 
-    const update = () => header.classList.toggle('scrolled', scrollY > 8);
-    addEventListener('scroll', update, { passive: true });
-    update();
   }
 
   function renderFooter() {
