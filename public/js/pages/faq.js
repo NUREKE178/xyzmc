@@ -3,7 +3,7 @@
  */
 (function () {
   'use strict';
-  const { C, $, esc, section, head, pageHero, banners, animate } = window.XYZ;
+  const { C, $, esc, section, head, pageHero, banners, loadContent, applyBanners, animate } = window.XYZ;
   const Q = C.faq;
 
   const list = section(`<div class="faq">${Q.items.map((f) => `
@@ -13,4 +13,5 @@
 
   $('#main').innerHTML = pageHero({ current: C.pages.faq.crumb, title: C.pages.faq.title, subtitle: C.pages.faq.subtitle }) + list + contact;
   animate();
+  loadContent().then((content) => applyBanners(content.banners));
 })();

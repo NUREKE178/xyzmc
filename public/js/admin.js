@@ -14,6 +14,7 @@
   const ICON = {
     news: '<path d="M5 5h11v14H7a2 2 0 01-2-2V5zM16 9h3v8a2 2 0 01-2 2M8 9h5M8 12h5M8 15h3"/>',
     team: '<circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 5.2a3.2 3.2 0 010 5.6M18 14.4c2 .7 3.5 2.6 3.5 5.6"/>',
+    banners: '<rect x="3" y="4" width="18" height="7" rx="2"/><rect x="3" y="13" width="18" height="7" rx="2"/><path d="M6 8h5M6 17h5"/>',
     hero: '<rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3 15l5-4 4 3 3-2 6 4"/><circle cx="16.5" cy="9.5" r="1.3"/>',
   };
   const icon = (n) => `<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[n]}</svg>`;
@@ -23,6 +24,7 @@
     news: [], newsImported: false,
     team: [], teamImported: false, teamDirty: false,
     hero: { type: 'default', src: '', poster: '' }, heroDirty: false,
+    banners: {}, bannersDirty: false,
     editing: null, key: 0,
   };
 
@@ -139,6 +141,7 @@
             <button class="adm-tab" role="tab" data-tab="news">${icon('news')}Новости</button>
             <button class="adm-tab" role="tab" data-tab="team">${icon('team')}Команда</button>
             <button class="adm-tab" role="tab" data-tab="hero">${icon('hero')}Главный экран</button>
+            <button class="adm-tab" role="tab" data-tab="banners">${icon('banners')}Магазин и соцсети</button>
           </nav>
           <div class="adm-side__foot"><a href="index.html" target="_blank" rel="noopener">Открыть сайт</a><button type="button" id="diag">Проверить хранилище</button><button type="button" id="logout">Выйти</button></div>
         </aside>
@@ -147,22 +150,22 @@
     $$('.adm-tab').forEach((b) => b.addEventListener('click', () => switchTab(b.dataset.tab)));
     $('#diag').addEventListener('click', showDiagnostics);
     $('#logout').addEventListener('click', async () => {
-      if ((state.teamDirty || state.heroDirty) && !(await confirmBox('Выйти?', 'Есть несохранённые изменения — они будут потеряны.', 'Выйти'))) return;
+      if ((state.teamDirty || state.heroDirty || state.bannersDirty) && !(await confirmBox('Выйти?', 'Есть несохранённые изменения — они будут потеряны.', 'Выйти'))) return;
       await api('logout', { method: 'POST' }).catch(() => {});
-      state.teamDirty = state.heroDirty = false;
+      state.teamDirty = state.heroDirty = state.bannersDirty = false;
       renderLogin();
     });
     switchTab(state.tab);
   }
 
   async function switchTab(tab) {
-    if (tab !== state.tab && ((state.tab === 'team' && state.teamDirty) || (state.tab === 'hero' && state.heroDirty))) {
+    if (tab !== state.tab && ((state.tab === 'team' && state.teamDirty) || (state.tab === 'hero' && state.heroDirty) || (state.tab === 'banners' && state.bannersDirty))) {
       if (!(await confirmBox('Несохранённые изменения', 'Перейти в другой раздел? Изменения будут потеряны.', 'Перейти'))) return;
       await reloadContent();
     }
     state.tab = tab;
     $$('.adm-tab').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.tab === tab)));
-    ({ news: renderNews, team: renderTeam, hero: renderHero })[tab]();
+    ({ news: renderNews, team: renderTeam, hero: renderHero, banners: renderBanners })[tab]();
   }
 
   const storageNote = () => state.storage === 'missing'
@@ -458,6 +461,69 @@
     } catch (e) { toast(e.message, true); busy(btn, false, 'Сохранить изменения'); }
   }
 
+  /* ================= Магазин и соцсети: картинки больших блоков ================= */
+  function renderBanners() {
+    const blocks = C.banners.items;
+    $('#view').innerHTML = `
+      <div class="adm-bar"><h1 class="adm-title">Магазин и соцсети</h1></div>
+      <p class="adm-lead">Картинки больших блоков внизу главной страницы. Картинка стоит неподвижно; лучше формат 4:3 (например, 1200×900).</p>
+      ${storageNote()}
+      <div class="adm-banners">${blocks.map((b) => {
+        const cur = state.banners[b.id] || {};
+        const custom = Boolean(cur._preview || cur.image);
+        return `<article class="adm-banner" data-id="${esc(b.id)}">
+          <div class="adm-banner__img"><img src="${esc(cur._preview || cur.image || b.image)}" alt=""></div>
+          <div class="adm-banner__body"><h3>${esc(b.title)}</h3>
+            <p class="adm-item__meta">${custom ? 'Своя картинка' : 'Стандартная картинка'}</p>
+            <div class="adm-filebar">
+              <button class="btn btn--secondary btn--sm" data-act="pick" type="button"><span>Загрузить картинку</span></button>
+              <button class="btn btn--secondary btn--sm btn--danger" data-act="reset" type="button" ${custom ? '' : 'hidden'}><span>Вернуть стандартную</span></button>
+            </div></div></article>`;
+      }).join('')}</div>
+      <div class="adm-savebar"><span class="adm-savebar__status ${state.bannersDirty ? 'is-dirty' : ''}">${state.bannersDirty ? 'Есть несохранённые изменения' : 'Все изменения сохранены'}</span><button class="btn" id="saveBanners" type="button" ${state.bannersDirty ? '' : 'disabled'}><span>Сохранить изменения</span></button></div>`;
+
+    $$('.adm-banner').forEach((card) => {
+      const id = card.dataset.id;
+      card.addEventListener('click', (e) => {
+        const act = e.target.closest('[data-act]')?.dataset.act;
+        if (act === 'pick') pickFile('image/*', async (f) => {
+          try {
+            const cur = state.banners[id] || (state.banners[id] = { image: '' });
+            if (cur._preview) URL.revokeObjectURL(cur._preview);
+            cur._file = await prepareImage(f, 1600, false);
+            cur._preview = URL.createObjectURL(cur._file);
+            state.bannersDirty = true; renderBanners();
+          } catch (ex) { toast(ex.message, true); }
+        });
+        if (act === 'reset') {
+          const cur = state.banners[id];
+          if (cur && cur._preview) URL.revokeObjectURL(cur._preview);
+          state.banners[id] = { image: '' };
+          state.bannersDirty = true; renderBanners();
+        }
+      });
+    });
+    $('#saveBanners').addEventListener('click', saveBanners);
+  }
+
+  async function saveBanners() {
+    const btn = $('#saveBanners');
+    busy(btn, true, 'Сохранение…');
+    try {
+      const items = {};
+      for (const b of C.banners.items) {
+        const cur = state.banners[b.id] || {};
+        items[b.id] = { image: cur._file ? await upload(cur._file, 'image') : cur.image || '' };
+      }
+      const res = await api('content/banners', { method: 'PUT', body: { items } });
+      Object.values(state.banners).forEach((x) => x._preview && URL.revokeObjectURL(x._preview));
+      state.banners = Object.fromEntries(Object.entries(res.banners || {}).map(([k, v]) => [k, { image: v.image }]));
+      state.bannersDirty = false;
+      renderBanners();
+      toast('Картинки сохранены');
+    } catch (e) { toast(e.message, true); busy(btn, false, 'Сохранить изменения'); }
+  }
+
   /* ================= Загрузка данных и запуск ================= */
   async function reloadContent() {
     const c = await fetch('/api/content', { cache: 'no-store' }).then((r) => r.json()).catch(() => ({}));
@@ -466,7 +532,8 @@
     state.teamImported = !Array.isArray(c.team);
     state.team = (Array.isArray(c.team) ? c.team : C.team.members).map((m) => ({ ...m, _key: ++state.key, nick: m.nick || '', role: m.role || '', photo: m.photo || '' }));
     state.hero = { type: 'default', src: '', poster: '', ...(c.hero || {}) };
-    state.teamDirty = state.heroDirty = false;
+    state.banners = Object.fromEntries(Object.entries(c.banners || {}).map(([k, v]) => [k, { image: v.image || '' }]));
+    state.teamDirty = state.heroDirty = state.bannersDirty = false;
   }
 
   async function bootstrap() {
@@ -480,6 +547,6 @@
     renderShell();
   }
 
-  window.addEventListener('beforeunload', (e) => { if (state.teamDirty || state.heroDirty) { e.preventDefault(); e.returnValue = ''; } });
+  window.addEventListener('beforeunload', (e) => { if (state.teamDirty || state.heroDirty || state.bannersDirty) { e.preventDefault(); e.returnValue = ''; } });
   bootstrap();
 })();

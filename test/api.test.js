@@ -163,3 +163,28 @@ test('сервер не трогает req.body (на Vercel он читает �
   assert.equal(d.read.ok, true);
   guarded.close();
 });
+
+test('картинки блоков «Магазин»/«Соцсети»: сохранение, валидация, очистка файлов', async () => {
+  // логин после предыдущего теста «выход» (cookie сброшена)
+  const login = await call('/api/login', { method: 'POST', body: { password: process.env.ADMIN_PASSWORD }, headers: { 'x-forwarded-for': '198.51.100.7' } });
+  cookie = login.headers.get('set-cookie').split(';')[0];
+  const up = await (await call('/api/upload?kind=image', { method: 'POST', raw: PNG })).json();
+  const file = path.join(process.env.DATA_DIR, 'uploads', path.basename(up.url));
+
+  const ok = await call('/api/content/banners', { method: 'PUT', body: { items: { shop: { image: up.url }, social: { image: '' } } } });
+  assert.equal(ok.status, 200);
+  const pub = await (await call('/api/content')).json();
+  assert.deepEqual(pub.banners, { shop: { image: up.url } });                     // пустое значение = стандартная картинка
+  assert.ok(fs.existsSync(file));
+
+  for (const bad of [{ shop: { image: 'javascript:alert(1)' } }, { 'не латиница': { image: '' } }, [], null]) {
+    const e = await call('/api/content/banners', { method: 'PUT', body: { items: bad } });
+    assert.equal(e.status, 400, JSON.stringify(bad));
+  }
+  const anon = await fetch(base + '/api/content/banners', { method: 'PUT', headers: { 'x-requested-with': 'xyz', 'content-type': 'application/json' }, body: '{"items":{}}' });
+  assert.equal(anon.status, 401);
+
+  await call('/api/content/banners', { method: 'PUT', body: { items: {} } });      // вернули стандартные — загруженный файл удаляется
+  await new Promise((r) => setTimeout(r, 150));
+  assert.ok(!fs.existsSync(file));
+});

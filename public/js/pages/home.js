@@ -4,7 +4,7 @@
  */
 (function () {
   'use strict';
-  const { C, $, $$, esc, rich, plain, extAttrs, formatDate, icon, label, section, head, banners, loadContent, sortNews, excerpt, articleUrl, reduceMotion, animate } = window.XYZ;
+  const { C, $, $$, esc, rich, plain, extAttrs, formatDate, icon, label, section, head, banners, loadContent, applyBanners, sortNews, excerpt, articleUrl, reduceMotion, animate } = window.XYZ;
   const N = C.news;
 
   const hero = `
@@ -34,6 +34,7 @@
   animate();
 
   loadContent().then((content) => {
+    applyBanners(content.banners);
     const items = sortNews(content.news).slice(0, N.sliderCount);
     const stage = $('#stage'), ctl = $('#ctl');
     if (!items.length) { stage.innerHTML = `<p class="empty">${esc(N.empty)}</p>`; return; }

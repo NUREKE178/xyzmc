@@ -77,7 +77,7 @@
   const banner = (b, i = 0) => {
     const buttons = b.buttons || [{ label: b.button, icon: b.icon, href: b.href }];
     return `
-    <article class="banner banner--${esc(b.tone || 'violet')}${i % 2 ? ' banner--flip' : ''}">
+    <article class="banner banner--${esc(b.tone || 'violet')}${i % 2 ? ' banner--flip' : ''}" data-id="${esc(b.id)}">
       <div class="banner__media"><img src="${esc(b.image)}" alt="" loading="lazy" width="720" height="540"></div>
       <div class="banner__body">
         <h3 class="banner__title">${esc(b.title)}</h3>
@@ -96,6 +96,7 @@
     news: C.news.items.map((n) => ({ ...n })),
     team: C.team.members.map((m) => ({ ...m })),
     hero: { type: 'default' },
+    banners: {},
   });
   function loadContent() {
     if (contentPromise) return contentPromise;
@@ -113,6 +114,7 @@
           news: Array.isArray(j.news) ? j.news : fb.news,
           team: Array.isArray(j.team) ? j.team : fb.team,
           hero: j.hero && j.hero.type ? j.hero : fb.hero,
+          banners: j.banners && typeof j.banners === 'object' ? j.banners : {},
         };
       } catch (e) { return fb; }                      // статический хостинг / нет сети — работаем на config.js
     })();
@@ -158,6 +160,22 @@
       if (hero.poster) $$('.hero__img, .page-hero__img').forEach((img) => { img.src = hero.poster; });
     }
   }
+
+  // Картинки блоков «Магазин» / «Соцсети» из админки; если своей нет — остаётся стандартная из config.js.
+  // Пока контент не загружен, картинка скрыта, чтобы стандартная не мелькала перед заменой.
+  function applyBanners(map = {}) {
+    $$('.banner').forEach((el) => {
+      const img = $('.banner__media img', el);
+      const custom = map[el.dataset.id] && map[el.dataset.id].image;
+      const show = () => img.classList.add('is-ready');
+      if (custom && img.getAttribute('src') !== custom) {
+        img.addEventListener('load', show, { once: true });
+        img.addEventListener('error', () => { img.src = (C.banners.items.find((b) => b.id === el.dataset.id) || {}).image || ''; show(); }, { once: true });
+        img.src = custom;
+      } else show();
+    });
+  }
+  setTimeout(() => $$('.banner__media img').forEach((i) => i.classList.add('is-ready')), 2200);   // страховка: не ждём API бесконечно
 
   // Скин по нику → запасной сервис → заглушка; свой загруженный файл имеет приоритет
   function memberImage(m) {
@@ -385,7 +403,7 @@
   /* ================= Публичный API для страниц ================= */
   window.XYZ = {
     C, S, $, $$, esc, rich, plain, extAttrs, formatDate, icon, iconInner, label, section, head, pageHero, banner, banners,
-    loadContent, applyHero, sortNews, excerpt, articleUrl, paragraphs, newsCard, newsSkeleton, memberImage, wireSkinFallback,
+    loadContent, applyHero, applyBanners, sortNews, excerpt, articleUrl, paragraphs, newsCard, newsSkeleton, memberImage, wireSkinFallback,
     animate, reduceMotion,
   };
 
