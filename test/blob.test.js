@@ -34,3 +34,11 @@ test('файлы загружаются в uploads/ и удаляются тол
   await store.deleteFile('https://evil.example/a.png');
   assert.deepEqual(calls.del, [url]);
 });
+
+test('«файл не найден» из SDK (исключение или null) не ломает первое сохранение', async () => {
+  const notFound = Object.assign(new Error('The requested blob does not exist'), { name: 'BlobNotFoundError' });
+  const real = fake.get;
+  fake.get = async () => { throw notFound; };
+  assert.deepEqual(await store.readContent(), {});
+  fake.get = real;
+});
