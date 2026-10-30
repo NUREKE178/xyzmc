@@ -1,0 +1,10 @@
+{
+  "linkedRole": "ID_РОЛИ_ДЛЯ_ВСЕХ_ПРИВЯЗАННЫХ_ИЛИ_ПУСТО",
+  "syncNickname": false,
+  "codeTtlMinutes": 10,
+  "groups": {
+    "vip": "ID_РОЛИ_VIP",
+    "premium": "ID_РОЛИ_PREMIUM",
+    "elite": ["ID_РОЛИ_ELITE", "ID_ДОП_РОЛИ"]
+  }
+}

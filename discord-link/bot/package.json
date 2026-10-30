@@ -1,0 +1,16 @@
+{
+  "name": "xyz-discord-link-bot",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Discord-бот сервера XYZ: привязка Minecraft-аккаунтов и синхронизация донат-ролей с LuckPerms",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node --test test/*.test.js"
+  },
+  "engines": { "node": ">=20" },
+  "dependencies": {
+    "discord.js": "^14.16.0",
+    "dotenv": "^16.4.5"
+  }
+}

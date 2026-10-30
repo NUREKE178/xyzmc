@@ -1,0 +1,28 @@
+# Адрес внутреннего API бота (API_HOST / API_PORT в .env бота)
+api-url: "http://127.0.0.1:8788"
+# Должен совпадать с API_SECRET бота. НИКОМУ не показывайте.
+api-secret: "change-me-to-a-long-random-string"
+
+# Сколько секунд после /discord ждём код в чате
+code-timeout-seconds: 120
+# Раз в сколько минут пересылать группы онлайн-игроков (ловит истёкший донат)
+resync-minutes: 10
+# false — только группы, выданные игроку напрямую; true — ещё и унаследованные
+include-inherited: false
+
+messages:
+  prefix: "<gradient:#7c5cff:#4ea1ff>[Discord]</gradient> "
+  enter-code: "<gray>Введите в чат <white>код из Discord</white> (команда <white>/discord</white> → <white>/link</white> в Discord). Сообщение увидите только вы. Отмена: <white>cancel</white>."
+  linked-ok: "<green>Готово! Ваш Discord привязан, роли выданы.</green>"
+  cancelled: "<gray>Привязка отменена.</gray>"
+  timeout: "<red>Время ввода кода вышло. Повторите /discord.</red>"
+  already-linked: "<yellow>Ваш аккаунт уже привязан к Discord. Отвязать: <white>/discord unlink</white>.</yellow>"
+  unlinked: "<gray>Discord отвязан, роли сняты.</gray>"
+  not-linked: "<gray>Discord не привязан.</gray>"
+  invalid-code: "<red>Неверный или просроченный код. Получите новый: /link в Discord.</red>"
+  too-many: "<red>Слишком много неверных попыток. Подождите 10 минут.</red>"
+  error: "<red>Бот сейчас недоступен, попробуйте позже.</red>"
+  no-permission: "<red>Нет прав.</red>"
+  reloaded: "<green>Конфиг перезагружен.</green>"
+  resynced: "<green>Группы онлайн-игроков отправлены в Discord.</green>"
+  players-only: "Только для игроков."

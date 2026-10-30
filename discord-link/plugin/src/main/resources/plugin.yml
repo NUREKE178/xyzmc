@@ -1,0 +1,18 @@
+name: XYZDiscordLink
+version: '${project.version}'
+main: kz.xyz.discordlink.DiscordLinkPlugin
+api-version: '1.21'
+depend: [LuckPerms]
+description: Привязка Discord-аккаунта и синхронизация донат-ролей с LuckPerms
+commands:
+  discord:
+    description: Привязать или отвязать Discord
+    usage: /discord [unlink|cancel]
+    permission: xyzdiscord.use
+permissions:
+  xyzdiscord.use:
+    description: Использовать /discord
+    default: true
+  xyzdiscord.admin:
+    description: /discord reload и /discord resync
+    default: op
