@@ -19,7 +19,7 @@
   const icon = (n) => `<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[n]}</svg>`;
 
   const state = {
-    tab: 'news', limits: { imageMb: 4, videoMb: 4 },
+    tab: 'news', limits: { imageMb: 4, videoMb: 4 }, storage: 'files',
     news: [], newsImported: false,
     team: [], teamImported: false, teamDirty: false,
     hero: { type: 'default', src: '', poster: '' }, heroDirty: false,
@@ -135,11 +135,12 @@
             <button class="adm-tab" role="tab" data-tab="team">${icon('team')}Команда</button>
             <button class="adm-tab" role="tab" data-tab="hero">${icon('hero')}Главный экран</button>
           </nav>
-          <div class="adm-side__foot"><a href="index.html" target="_blank" rel="noopener">Открыть сайт</a><button type="button" id="logout">Выйти</button></div>
+          <div class="adm-side__foot"><a href="index.html" target="_blank" rel="noopener">Открыть сайт</a><button type="button" id="diag">Проверить хранилище</button><button type="button" id="logout">Выйти</button></div>
         </aside>
         <main class="adm-main" id="view"></main>
       </div>`;
     $$('.adm-tab').forEach((b) => b.addEventListener('click', () => switchTab(b.dataset.tab)));
+    $('#diag').addEventListener('click', showDiagnostics);
     $('#logout').addEventListener('click', async () => {
       if ((state.teamDirty || state.heroDirty) && !(await confirmBox('Выйти?', 'Есть несохранённые изменения — они будут потеряны.', 'Выйти'))) return;
       await api('logout', { method: 'POST' }).catch(() => {});
@@ -159,6 +160,28 @@
     ({ news: renderNews, team: renderTeam, hero: renderHero })[tab]();
   }
 
+  const storageNote = () => state.storage === 'missing'
+    ? '<p class="adm-note adm-note--warn">Хранилище не подключено, поэтому сохранить изменения пока нельзя. В Vercel откройте Storage → ваш Blob → Connect Project, затем сделайте Redeploy. Нажмите «Проверить хранилище» слева, чтобы убедиться.</p>' : '';
+
+  async function showDiagnostics() {
+    const dlg = document.createElement('dialog');
+    dlg.className = 'adm-dialog adm-dialog--sm';
+    dlg.innerHTML = '<div class="adm-dialog__box"><h2>Проверка хранилища</h2><p class="adm-lead" style="margin:0" id="diagBody">Проверяем запись и чтение…</p><div class="adm-dialog__foot"><button class="btn" type="button" data-close><span>Закрыть</span></button></div></div>';
+    document.body.appendChild(dlg);
+    dlg.addEventListener('click', (e) => { if (e.target === dlg || e.target.closest('[data-close]')) dlg.close(); });
+    dlg.addEventListener('close', () => dlg.remove());
+    dlg.showModal();
+    const body = $('#diagBody', dlg);
+    try {
+      const d = await api('diagnostics');
+      const mark = (r) => (r && r.ok ? '✓ работает' : `✗ ${esc(r?.error || 'не проверено')}`);
+      body.innerHTML = `<b>Режим:</b> ${d.mode === 'vercel-blob' ? 'Vercel Blob' : 'файлы на сервере'}<br>
+        <b>Доступ к Blob:</b> ${d.credentials ? esc(d.credentials) : 'не найден'}<br>
+        <b>Запись:</b> ${mark(d.write)}<br><b>Чтение:</b> ${mark(d.read)}
+        ${d.hint ? `<br><br><span style="color:#ffd3de">${esc(d.hint)}</span>` : (d.write?.ok && d.read?.ok ? '<br><br>Всё в порядке — сохранение должно работать.' : '')}`;
+    } catch (e) { body.textContent = e.message; }
+  }
+
   /* ================= Новости ================= */
   const today = () => new Date().toISOString().slice(0, 10);
   const fmt = (iso) => new Date(iso).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -169,6 +192,7 @@
     $('#view').innerHTML = `
       <div class="adm-bar"><div><h1 class="adm-title">Новости</h1></div><button class="btn" id="newNews" type="button"><span>Добавить новость</span></button></div>
       <p class="adm-lead">На главной показываются последние ${C.news.homeCount} новостей, остальные — в архиве.</p>
+      ${storageNote()}
       ${state.newsImported ? '<p class="adm-note">Сейчас показаны новости-заглушки из config.js. Как только вы опубликуете или удалите любую новость, список станет управляться отсюда.</p>' : ''}
       <div class="adm-list">${items.length ? items.map((n) => `
         <article class="adm-item">
@@ -268,6 +292,7 @@
     $('#view').innerHTML = `
       <div class="adm-bar"><h1 class="adm-title">Команда</h1><button class="btn" id="addMember" type="button"><span>Добавить участника</span></button></div>
       <p class="adm-lead">Загрузите фото участника или укажите ник Minecraft — по нему сайт подтянет скин автоматически.</p>
+      ${storageNote()}
       ${state.teamImported ? '<p class="adm-note">Сейчас показан запасной список из config.js. После сохранения команда будет управляться отсюда.</p>' : ''}
       <datalist id="roles">${ROLES.map((r) => `<option value="${esc(r)}">`).join('')}</datalist>
       <div class="adm-team">${state.team.length ? state.team.map((m, i) => `
@@ -360,6 +385,7 @@
     $('#view').innerHTML = `
       <div class="adm-bar"><h1 class="adm-title">Главный экран</h1></div>
       <p class="adm-lead">Фон за заголовком на главной странице и в шапках внутренних страниц.</p>
+      ${storageNote()}
       <div class="adm-radios" role="radiogroup" aria-label="Тип фона">
         ${[['default', 'Стандартный', 'Картинка из файла assets/hero.jpg'], ['image', 'Картинка', 'Своё изображение, будет размыто'], ['video', 'Видео', 'Зацикленное видео без звука']].map(([v, t, d]) => `
           <label class="adm-radio"><input type="radio" name="heroType" value="${v}" ${h.type === v ? 'checked' : ''}><b>${t}</b><span>${d}</span></label>`).join('')}
@@ -433,6 +459,7 @@
     if (!s.enabled) return renderDisabled();
     if (!s.admin) return renderLogin();
     state.limits = s.limits || state.limits;
+    state.storage = s.storage || 'files';
     await reloadContent();
     renderShell();
   }

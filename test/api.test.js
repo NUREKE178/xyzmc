@@ -140,3 +140,26 @@ test('выход сбрасывает сессию; блокировка пос�
   for (let i = 0; i < 9; i++) last = await call('/api/login', { method: 'POST', body: { password: 'wrong-wrong-' + i }, headers: { 'x-forwarded-for': '203.0.113.9' } });
   assert.equal(last.status, 429);
 });
+
+test('сервер не трогает req.body (на Vercel он читает тело с лимитом 1 МБ)', async () => {
+  const guarded = http.createServer((req, res) => {
+    Object.defineProperty(req, 'body', { get() { throw new Error('req.body must not be accessed'); } });
+    handle(req, res);
+  });
+  await new Promise((r) => guarded.listen(0, r));
+  const b = `http://127.0.0.1:${guarded.address().port}`;
+  const login = await fetch(b + '/api/login', { method: 'POST', headers: { 'x-requested-with': 'xyz', 'content-type': 'application/json' }, body: JSON.stringify({ password: process.env.ADMIN_PASSWORD }) });
+  assert.equal(login.status, 200);
+  const ck = login.headers.get('set-cookie').split(';')[0];
+  const big = Buffer.concat([PNG, Buffer.alloc(1.5 * 1024 * 1024)]);                      // больше 1 МБ
+  const up = await fetch(b + '/api/upload?kind=image', { method: 'POST', headers: { 'x-requested-with': 'xyz', cookie: ck, 'content-type': 'image/png' }, body: big });
+  assert.equal(up.status, 201);
+  const put = await fetch(b + '/api/content/team', { method: 'PUT', headers: { 'x-requested-with': 'xyz', cookie: ck, 'content-type': 'application/json' }, body: JSON.stringify({ items: [{ name: 'A', role: 'B' }] }) });
+  assert.equal(put.status, 200);
+  const diag = await fetch(b + '/api/diagnostics', { headers: { cookie: ck } });
+  const d = await diag.json();
+  assert.equal(d.mode, 'filesystem');
+  assert.equal(d.write.ok, true);
+  assert.equal(d.read.ok, true);
+  guarded.close();
+});

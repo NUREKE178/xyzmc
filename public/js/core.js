@@ -73,22 +73,21 @@
       </div>
     </section>`;
 
-  // Баннер: панель с персонажем (заглушка) и текстом. Нечётные — зеркально.
+  // Баннер: статичная картинка + текст. Нечётные — зеркально. Никакой анимации картинки.
   const banner = (b, i = 0) => {
     const buttons = b.buttons || [{ label: b.button, icon: b.icon, href: b.href }];
     return `
     <article class="banner banner--${esc(b.tone || 'violet')}${i % 2 ? ' banner--flip' : ''}">
-      <div class="banner__panel">
-        <div class="banner__figure"><img class="banner__art" src="${esc(b.image)}" alt="" aria-hidden="true" loading="lazy" width="392" height="490"></div>
-        <div class="banner__body">
-          <h3 class="banner__title">${esc(b.title)}</h3>
-          <p class="banner__text">${esc(b.text)}</p>
-          <div class="banner__actions">${buttons.map((x, k) => `<a class="btn${buttons.length > 1 && k ? ' btn--secondary' : ''}" href="${esc(x.href)}"${extAttrs(x.href)}>${label(x.label, x.icon)}</a>`).join('')}</div>
-        </div>
+      <div class="banner__media"><img src="${esc(b.image)}" alt="" loading="lazy" width="720" height="540"></div>
+      <div class="banner__body">
+        <h3 class="banner__title">${esc(b.title)}</h3>
+        <p class="banner__text">${esc(b.text)}</p>
+        <div class="banner__actions">${buttons.map((x, k) => `<a class="btn${buttons.length > 1 && k ? ' btn--secondary' : ''}" href="${esc(x.href)}"${extAttrs(x.href)}>${label(x.label, x.icon)}</a>`).join('')}</div>
       </div>
     </article>`;
   };
-  const banners = (ids) => C.banners.items.filter((b) => !ids || ids.includes(b.id)).map(banner).join('');
+  // Чередование (картинка слева/справа) считается по месту баннера в config, а не в выборке
+  const banners = (ids) => C.banners.items.map((b, i) => (!ids || ids.includes(b.id) ? banner(b, i) : '')).join('');
 
   /* ================= Данные: API → запасной вариант из config.js ================= */
   let contentPromise;
@@ -224,15 +223,14 @@
       return `<a href="${esc(n.href)}"${n.external ? extAttrs(n.href) : ''}${active ? ' class="active" aria-current="page"' : ''}>${esc(n.label)}</a>`;
     };
     const links = C.nav.map(link).join('');
-    const cta = (cls) => `<button class="btn ${cls}" type="button" data-copy="${esc(S.ip)}">${label(C.headerCta, 'copy')}</button>`;
+    // Кнопка с адресом сервера: клик копирует IP, подпись на секунду меняется на «СКОПИРОВАНО!»
+    const cta = (cls) => `<button class="btn ${cls}" type="button" data-copy="${esc(S.ip)}" aria-label="Скопировать IP ${esc(S.ip)}">${label(S.ip, 'copy')}</button>`;
     $('#header').innerHTML = `
       <div class="container header__row">
-        <a class="brand" href="index.html" aria-label="${esc(S.name)} — на главную"><img class="brand__logo" src="${esc(S.logo)}" alt="" width="36" height="36"><span class="brand__name">${esc(S.name)}</span></a>
+        <a class="brand" href="index.html" aria-label="${esc(S.name)} — на главную"><img class="brand__logo" src="${esc(S.logo)}" alt="" width="44" height="44"><span class="brand__name">${esc(S.name)}</span></a>
         <nav class="nav" aria-label="Основная навигация">${links}</nav>
         <div class="header__actions">
           ${cta('header__cta')}
-          <a class="icon-btn" href="${esc(S.telegramUrl)}" target="_blank" rel="noopener" aria-label="Telegram">${icon('telegram')}</a>
-          <a class="icon-btn" href="${esc(S.discordUrl)}" target="_blank" rel="noopener" aria-label="Discord">${icon('discord')}</a>
           <button class="burger" id="burger" type="button" aria-label="Меню" aria-expanded="false" aria-controls="mobileNav"><span></span><span></span><span></span></button>
         </div>
       </div>
@@ -255,7 +253,7 @@
     const links = [...C.nav, ...(C.footerExtra || [])];
     $('#footer').innerHTML = `
       <div class="container footer__grid">
-        <div class="footer__col"><a class="brand" href="index.html"><img class="brand__logo" src="${esc(S.logo)}" alt="" width="36" height="36"><span class="brand__name">${esc(S.name)}</span></a><p class="footer__ip">${esc(S.ip)}</p></div>
+        <div class="footer__col"><a class="brand" href="index.html"><img class="brand__logo" src="${esc(S.logo)}" alt="" width="44" height="44"><span class="brand__name">${esc(S.name)}</span></a><p class="footer__ip">${esc(S.ip)}</p></div>
         <div class="footer__col"><h4>${esc(FT.quickLinksTitle)}</h4><ul>${links.map((n) => `<li><a href="${esc(n.href)}"${extAttrs(n.href)}>${esc(n.label)}</a></li>`).join('')}</ul></div>
         <div class="footer__col"><h4>${esc(FT.socialsTitle)}</h4><div class="socials">${social(S.telegramUrl, 'Telegram', 'telegram')}${social(S.discordUrl, 'Discord', 'discord')}${social(S.shopUrl, 'Магазин', 'bag')}</div></div>
       </div>
@@ -305,29 +303,34 @@
     $('#chatX').onclick = () => { chat.hidden = true; storage.set('xyz-chat-closed', '1'); };
   }
 
-  /* ================= Анимация появления: каждый блок — отдельно при прокрутке ================= */
+  /* ================= Анимация появления: каждый блок — отдельно, когда до него дошли ================= */
   const ANIM = [
-    '.crumbs', '.page-hero__title', '.page-hero__sub', '.head__title', '.head__sub', '.card', '.banner', '.faq__item',
+    '.crumbs', '.page-hero__title', '.page-hero__sub', '.head__title', '.head__sub', '.card', '.faq__item',
     '.rule-block', '.mods__tools', '.mods__group', '.center', '.article__cover', '.article__meta', '.article__body > *',
-    '.filters', '.footer__col', '.loadmore', '.empty',
+    '.footer__col', '.loadmore', '.empty',
   ].join(',');
-  let observer;
+  const BIG = '.banner, .slider';                         // крупные блоки: ждём, пока они заметно покажутся на экране
+  let observer, bigObserver;
+  const reveal = (obs) => (entries) => entries.forEach((en) => {
+    if (!en.isIntersecting) return;
+    const el = en.target;
+    obs.unobserve(el);
+    el.classList.add('in');
+    setTimeout(() => { el.removeAttribute('data-anim'); el.classList.remove('in'); }, 1600);   // дальше — обычное состояние (hover и т. д.)
+  });
   function animate(root = document) {
     if (reduceMotion || !('IntersectionObserver' in window)) return;
-    observer = observer || new IntersectionObserver((entries) => entries.forEach((en) => {
-      if (!en.isIntersecting) return;
-      const el = en.target;
-      observer.unobserve(el);
-      el.classList.add('in');
-      // после появления снимаем состояние, чтобы hover-эффекты работали как обычно
-      setTimeout(() => { el.removeAttribute('data-anim'); el.classList.remove('in'); }, 1400);
-    }), { threshold: 0.12, rootMargin: '0px 0px -5% 0px' });
-    const fresh = $$(ANIM, root).filter((el) => !el.hasAttribute('data-anim') && !el.closest('[data-anim]') && !el.closest('.hero'));
-    fresh.forEach((el) => {
+    observer = observer || new IntersectionObserver((e) => reveal(observer)(e), { threshold: 0.12, rootMargin: '0px 0px -5% 0px' });
+    bigObserver = bigObserver || new IntersectionObserver((e) => reveal(bigObserver)(e), { threshold: 0.35, rootMargin: '0px 0px -18% 0px' });
+    const tag = (el, obs, delay, dir) => {
+      el.style.setProperty('--d', delay + 'ms');
+      el.setAttribute('data-anim', dir);
+      obs.observe(el);
+    };
+    $$(BIG, root).filter((el) => !el.hasAttribute('data-anim')).forEach((el) => tag(el, bigObserver, 0, el.matches('.banner--flip') ? 'right' : el.matches('.banner') ? 'left' : 'up'));
+    $$(ANIM, root).filter((el) => !el.hasAttribute('data-anim') && !el.closest('[data-anim]') && !el.closest('.hero') && !el.closest(BIG)).forEach((el) => {
       const siblings = [...el.parentElement.children].filter((c) => c.matches(ANIM));
-      el.style.setProperty('--d', `${(siblings.indexOf(el) % 4) * 80}ms`);
-      el.setAttribute('data-anim', '');
-      observer.observe(el);
+      tag(el, observer, (siblings.indexOf(el) % 4) * 80, 'up');
     });
   }
 

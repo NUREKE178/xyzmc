@@ -8,6 +8,7 @@
 .adm-login__box h1 { font-size: 22px; }
 .adm-login__box p { margin-top: 8px; color: var(--muted); font-size: 15px; }
 .adm-login__box form { display: grid; gap: 14px; margin-top: 24px; text-align: left; }
+.adm-note--warn { border-color: rgba(217, 68, 82, .55); background: rgba(217, 68, 82, .12); color: #ffd3da; }
 .adm-error { min-height: 20px; color: #f2a0b3; font-size: 14px; }
 
 /* Каркас: боковая панель + контент */

@@ -31,9 +31,6 @@ window.XYZ_CONFIG = {
   // Дополнительные ссылки только в подвале
   footerExtra: [{ label: "О сервере", href: "play.html" }],
 
-  // Кнопка в шапке копирует IP; после нажатия подпись меняется на texts.copied
-  headerCta: "Скопировать IP",
-
   // Шапки внутренних страниц (заголовок + хлебные крошки)
   pages: {
     homeCrumb: "Главная",
@@ -97,9 +94,9 @@ window.XYZ_CONFIG = {
   // ---------- Новости ----------
   // Запасные новости (пока в админке ничего не опубликовано). `text` — полный текст, абзацы разделяются пустой строкой.
   news: {
-    title: "Последние {новости}",
+    title: "Новости {XYZ}",
     subtitle: "Узнай, что нового!",
-    homeCount: 4,                // сколько карточек на главной
+    sliderCount: 5,              // сколько последних новостей листается в слайдере на главной
     pageSize: 9,                 // сколько показывать в архиве за раз
     readMore: "Читать далее",
     moreLabel: "Больше новостей",
@@ -120,12 +117,12 @@ window.XYZ_CONFIG = {
   },
 
   // ---------- Баннеры (главная и FAQ) ----------
-  // image — PNG персонажа с прозрачным фоном (сейчас заглушки). tone: violet | indigo | plum.
+  // image — обычная статичная картинка (JPG/PNG, лучше 4:3; сейчас заглушки). tone: violet | indigo | plum.
   // Либо одна кнопка (button + href + icon), либо несколько (buttons).
   banners: {
     items: [
-      { id: "shop", tone: "violet", title: "Магазин", text: "Привилегии, наборы и другие товары для комфортной игры на сервере.", button: "Перейти в магазин", icon: "bag", href: "https://shop.xyzmc.su", image: "assets/banner-shop.png" },
-      { id: "social", tone: "indigo", title: "Соцсети", text: "Новости, ивенты, помощь и общение — в наших каналах.", image: "assets/banner-social.png",
+      { id: "shop", tone: "violet", title: "Магазин", text: "Привилегии, наборы и другие товары для комфортной игры на сервере.", button: "Перейти в магазин", icon: "bag", href: "https://shop.xyzmc.su", image: "assets/banner-shop.jpg" },
+      { id: "social", tone: "indigo", title: "Соцсети", text: "Новости, ивенты, помощь и общение — в наших каналах.", image: "assets/banner-social.jpg",
         buttons: [
           { label: "Telegram", icon: "telegram", href: "https://t.me/xyz_nw" },
           { label: "Discord", icon: "discord", href: "https://discord.gg/yKkcFfgZ6b" },
