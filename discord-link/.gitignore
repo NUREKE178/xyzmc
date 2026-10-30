@@ -1,0 +1,5 @@
+bot/node_modules/
+bot/.env
+bot/config.json
+bot/data/
+plugin/target/
