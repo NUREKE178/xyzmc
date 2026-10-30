@@ -1,0 +1,45 @@
+# Автообновление сайта: каждый коммит в ветку claude/** проверяется тестами и переносится в main.
+# Vercel собирает main и публикует сайт сам (Production Branch = main).
+name: Sync to main
+
+on:
+  push:
+    branches: ['claude/**']
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-main
+  cancel-in-progress: false
+
+jobs:
+  test-and-sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # Если тесты красные, main не трогаем — на сайт не попадёт сломанная версия
+      - run: npm test
+
+      - name: Update main
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git ls-remote --exit-code --heads origin main >/dev/null 2>&1; then
+            git fetch origin main
+            git checkout -B main origin/main
+            git merge --no-edit "$GITHUB_SHA"        # fast-forward, если main — предок; иначе обычное слияние
+          else
+            git checkout -B main "$GITHUB_SHA"
+          fi
+          git push origin main
