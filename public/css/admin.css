@@ -1,7 +1,7 @@
 /* ==========================================================
    Админ-панель XYZ. Использует токены и кнопки из style.css.
    ========================================================== */
-.adm { min-height: 100vh; }
+.adm { min-height: 100vh; padding-top: 0; }
 .adm-login { display: grid; place-items: center; min-height: 100vh; padding: 24px; }
 .adm-login__box { width: 100%; max-width: 400px; padding: 36px 32px 32px; border: 1px solid var(--line-2); border-radius: var(--r-lg); background: var(--surface); box-shadow: var(--shadow-lg); text-align: center; }
 .adm-login__box img { width: 64px; height: 64px; margin: 0 auto 14px; }
