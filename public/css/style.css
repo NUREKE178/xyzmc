@@ -293,9 +293,9 @@ h3, h4 { font-weight: 700; line-height: 1.3; }
 .banner { --b: #2b2142; display: grid; grid-template-columns: 1fr 1fr; min-height: 420px; overflow: hidden; border: 1px solid var(--line-2); border-radius: var(--r-lg); background: var(--b); box-shadow: var(--shadow-md); }
 .banner--indigo { --b: #262447; }
 .banner--plum { --b: #33223f; }
-.banner__media { position: relative; min-height: 320px; background: var(--surface-2); }
+.banner__media { position: relative; min-height: 320px; background: var(--surface-2); }   /* картинка неподвижна */
 .banner__media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-.banner__body { display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 16px; padding: clamp(36px, 5vw, 72px); }
+.banner__body { position: relative; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 16px; padding: clamp(36px, 5vw, 72px); }
 .banner__title { font: 500 clamp(34px, 4vw, 52px)/1.12 var(--font-display); letter-spacing: -.02em; }
 .banner__text { max-width: 460px; color: #c4bcd8; font-size: 19px; }
 .banner__actions { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 12px; }
