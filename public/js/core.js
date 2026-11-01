@@ -171,6 +171,7 @@
       if (custom && img.getAttribute('src') !== custom) {
         img.addEventListener('load', show, { once: true });
         img.addEventListener('error', () => { img.src = (C.banners.items.find((b) => b.id === el.dataset.id) || {}).image || ''; show(); }, { once: true });
+        img.loading = 'eager';                       // подменённую картинку грузим сразу, чтобы блок не ждал прокрутки
         img.src = custom;
       } else show();
     });
@@ -333,53 +334,47 @@
     el.classList.add('in');
     setTimeout(() => { el.removeAttribute('data-anim'); el.classList.remove('in'); }, 1600);   // дальше — обычное состояние (hover и т. д.)
   });
-  /* Баннеры «Магазин» и «Соцсети»: картинка стоит на месте, а заголовок, текст и кнопка выезжают сбоку по очереди.
-     Движение привязано к прокрутке: вниз — выезжают, вверх — уезжают обратно. Каждый баннер зависит только от своего положения. */
+  /* Баннеры «Магазин» и «Соцсети»: блок «поднимается» — наклон в 3D → ровно, рост 90% → 100%, проявление; затем по очереди
+     появляются заголовок, текст и кнопка. Движение привязано к прокрутке (вниз — собирается, вверх — разбирается),
+     у каждого блока своё, зависит только от его положения. Только transform и opacity — всё считает видеокарта. */
   let bannersBound = false;
   function initBannerScroll() {
     if (bannersBound || reduceMotion) return;
     const banners = $$('.banner').map((el) => ({
       el, flip: el.classList.contains('banner--flip'),
-      parts: [$('.banner__title', el), $('.banner__text', el), $('.banner__actions', el)].filter(Boolean).map((node) => ({ node, need: 0 })),
+      parts: [$('.banner__title', el), $('.banner__text', el), $('.banner__actions', el)].filter(Boolean),
     }));
     if (!banners.length) return;
     bannersBound = true;
     const clamp = (v) => Math.min(1, Math.max(0, v));
-    const ease = (t) => t * t * (3 - 2 * t);                       // smoothstep: мягкий старт и финиш
+    const ease = (t) => 1 - Math.pow(1 - t, 3);                  // easeOutCubic
     let queued = false;
 
-    // На сколько нужно сдвинуть каждый элемент, чтобы он целиком скрылся за краем баннера (зависит от вёрстки: десктоп / телефон)
-    const measure = () => {
-      for (const b of banners) {
-        b.parts.forEach((x) => { x.node.style.transform = ''; });
-        const box = b.el.getBoundingClientRect();
-        b.parts.forEach((x) => {
-          const r = x.node.getBoundingClientRect();
-          x.need = (b.flip ? r.right - box.left : box.right - r.left) + 8;
-        });
-      }
-    };
     const update = () => {
       queued = false;
       const vh = innerHeight;
       for (const b of banners) {
         const r = b.el.getBoundingClientRect();
-        // 0 — верх баннера чуть выше нижнего края экрана; 1 — баннер целиком на экране. Каждый баннер считается отдельно.
-        const length = Math.min(r.height, vh) * 0.9 + vh * 0.1;
-        const p = clamp((vh * 0.9 - r.top) / length);
-        b.parts.forEach((x, i) => {
-          const local = clamp((p - i * 0.08) / 0.62);                // заголовок → текст → кнопка
-          x.node.style.transform = local >= 1 ? '' : `translate3d(${((b.flip ? -1 : 1) * (1 - ease(local)) * x.need).toFixed(1)}px,0,0)`;
+        // 0 — верх блока чуть выше нижнего края экрана; 1 — блок почти целиком виден
+        const p = clamp((vh * 0.92 - r.top) / (Math.min(r.height, vh) * 0.8 + vh * 0.1));
+        const f = ease(clamp(p / 0.62));
+        const animating = p > 0 && p < 1;
+        b.el.style.willChange = animating ? 'transform, opacity' : 'auto';          // слой держим только пока идёт анимация
+        b.el.style.opacity = p >= 1 ? '' : clamp(p / 0.3).toFixed(3);
+        b.el.style.transform = f >= 1 ? '' :
+          `perspective(1400px) translate3d(0,${((1 - f) * 90).toFixed(1)}px,0) rotateX(${((1 - f) * 16).toFixed(2)}deg) rotateY(${((b.flip ? 1 : -1) * (1 - f) * 8).toFixed(2)}deg) scale(${(0.88 + 0.12 * f).toFixed(4)})`;
+        b.parts.forEach((node, i) => {
+          const local = clamp((p - 0.24 - i * 0.1) / 0.4);
+          node.style.opacity = local >= 1 ? '' : local.toFixed(3);
+          node.style.transform = local >= 1 ? '' : `translate3d(0,${((1 - ease(local)) * 34).toFixed(1)}px,0)`;
         });
       }
     };
     const schedule = () => { if (!queued) { queued = true; requestAnimationFrame(update); } };
-    const remeasure = () => { measure(); schedule(); };
-    banners.forEach((b) => b.parts.forEach((x) => { x.node.style.willChange = 'transform'; }));
+    banners.forEach((b) => { b.el.style.transformOrigin = '50% 90%'; });
     addEventListener('scroll', schedule, { passive: true });
-    addEventListener('resize', remeasure);
-    addEventListener('load', remeasure);
-    measure();
+    addEventListener('resize', schedule);
+    addEventListener('load', schedule);
     update();
   }
 
