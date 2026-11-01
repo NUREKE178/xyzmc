@@ -334,14 +334,16 @@
     el.classList.add('in');
     setTimeout(() => { el.removeAttribute('data-anim'); el.classList.remove('in'); }, 1600);   // дальше — обычное состояние (hover и т. д.)
   });
-  /* Баннеры «Магазин» и «Соцсети» — «кинематографичное» появление, привязанное к прокрутке (вниз — собирается, вверх — разбирается):
+  /* Баннеры «Магазин» и «Соцсети» — «кинематографичное» появление, один раз за загрузку страницы:
        1) рамка блока выплывает снизу;
        2) светлая линия «открывает» картинку шторкой (сама картинка не двигается);
        3) заголовок собирается по буквам из-под маски, под ним вырастает подчёркивание;
        4) проявляется описание;
        5) кнопка «выпрыгивает» с лёгкой пружиной.
+     Анимация стартует, когда до блока долистали, идёт по времени и больше не повторяется:
+     ни прокрутка вверх-вниз, ни повторный заход к блоку её не запускают — только обновление страницы.
      JS только считает прогресс этапов и кладёт его в CSS-переменные (--card, --img, --title, --text, --btn),
-     а всё движение описано в CSS (transform / opacity / clip-path). У каждого блока прогресс свой. */
+     всё движение описано в CSS (transform / opacity / clip-path). Каждый блок стартует сам по себе. */
   let bannersBound = false;
   function initBannerScroll() {
     if (bannersBound || reduceMotion) return;
@@ -353,34 +355,47 @@
     const inOutCubic = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
     const outBack = (t) => { const c = 1.9; return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2); };
     const VARS = ['--card', '--img', '--title', '--text', '--btn'];
-    let queued = false;
+    const DURATION = 1700;                                            // мс на весь «спектакль»
 
-    const update = () => {
-      queued = false;
-      const vh = innerHeight;
-      for (const el of banners) {
-        // меряем неподвижную обёртку: сам блок во время анимации смещается, и прогресс зависел бы от собственного движения
-        const r = el.parentElement.getBoundingClientRect();
-        // 0 — верх блока чуть выше нижнего края экрана; 1 — блок поднялся до ~38% высоты экрана (виден целиком с запасом)
-        const p = clamp((vh * 0.94 - r.top) / (vh * 0.56));
-        if (p >= 1) {                                               // готово: убираем переменные, остаётся конечное состояние из CSS
-          if (el.dataset.stage !== 'done') { VARS.forEach((v) => el.style.removeProperty(v)); el.style.willChange = 'auto'; el.dataset.stage = 'done'; }
-          continue;
-        }
-        el.dataset.stage = 'run';
-        el.style.willChange = 'transform, opacity';
-        el.style.setProperty('--card', outCubic(clamp(p / 0.25)).toFixed(4));
-        el.style.setProperty('--img', inOutCubic(clamp((p - 0.05) / 0.5)).toFixed(4));
-        el.style.setProperty('--title', clamp((p - 0.28) / 0.44).toFixed(4));
-        el.style.setProperty('--text', outCubic(clamp((p - 0.55) / 0.3)).toFixed(4));
-        el.style.setProperty('--btn', outBack(clamp((p - 0.68) / 0.32)).toFixed(4));
-      }
+    const setStage = (el, p) => {
+      el.style.setProperty('--card', outCubic(clamp(p / 0.25)).toFixed(4));
+      el.style.setProperty('--img', inOutCubic(clamp((p - 0.05) / 0.5)).toFixed(4));
+      el.style.setProperty('--title', clamp((p - 0.28) / 0.44).toFixed(4));
+      el.style.setProperty('--text', outCubic(clamp((p - 0.55) / 0.3)).toFixed(4));
+      el.style.setProperty('--btn', outBack(clamp((p - 0.68) / 0.32)).toFixed(4));
     };
-    const schedule = () => { if (!queued) { queued = true; requestAnimationFrame(update); } };
-    addEventListener('scroll', schedule, { passive: true });
-    addEventListener('resize', schedule);
-    addEventListener('load', schedule);
-    update();
+    const finish = (el) => { VARS.forEach((v) => el.style.removeProperty(v)); el.style.willChange = 'auto'; el.dataset.stage = 'done'; };
+    const play = (el, delay) => {
+      if (el.dataset.stage === 'run' || el.dataset.stage === 'done') return;
+      el.dataset.stage = 'run';
+      el.style.willChange = 'transform, opacity';
+      const t0 = performance.now() + delay;
+      const frame = (now) => {
+        const p = clamp((now - t0) / DURATION);
+        setStage(el, p);
+        if (p < 1) requestAnimationFrame(frame); else finish(el);
+      };
+      requestAnimationFrame(frame);
+    };
+
+    // до срабатывания блок «припаркован» (скрыт); если до него уже пролистали или JS-наблюдателя нет — сразу готовый
+    const parked = [];
+    for (const el of banners) {
+      const above = el.parentElement.getBoundingClientRect().bottom < 0;           // страница восстановлена ниже блока
+      if (above || !('IntersectionObserver' in window)) { finish(el); continue; }
+      el.dataset.stage = 'parked';
+      setStage(el, 0);
+      parked.push(el);
+    }
+    if (!parked.length) return;
+    const io = new IntersectionObserver((entries) => {
+      let order = 0;
+      entries.filter((e) => e.isIntersecting).forEach((e) => {
+        io.unobserve(e.target);
+        play(e.target.querySelector('.banner'), order++ * 350);       // если на экране сразу оба — с небольшим интервалом
+      });
+    }, { threshold: 0.3, rootMargin: '0px 0px -10% 0px' });
+    parked.forEach((el) => io.observe(el.parentElement));                          // наблюдаем неподвижную обёртку, а не сам смещающийся блок
   }
 
   function animate(root = document) {
