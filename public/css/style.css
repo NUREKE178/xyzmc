@@ -303,6 +303,32 @@ h3, h4 { font-weight: 700; line-height: 1.3; }
 .banner__actions { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 12px; }
 .banner--flip .banner__media { order: 2; }
 
+/* ----- Появление блоков «Магазин» и «Соцсети» (значения --card, --img, --title, --text, --btn ставит core.js по прокрутке;
+         без переменных везде конечное состояние: 1) ----- */
+.banner { opacity: var(--card, 1); transform: translate3d(0, calc((1 - var(--card, 1)) * 80px), 0) scale(calc(.94 + .06 * var(--card, 1))); transform-origin: 50% 100%; }
+.banner__media { clip-path: inset(0 calc((1 - var(--img, 1)) * 100%) 0 0); }
+.banner--flip .banner__media { clip-path: inset(0 0 0 calc((1 - var(--img, 1)) * 100%)); }
+/* яркая линия на границе шторки: видна только пока картинка открывается */
+.banner__media::after { content: ''; position: absolute; top: 0; bottom: 0; left: calc(var(--img, 1) * 100% - 4px); width: 4px; background: var(--violet-hi); opacity: calc(4 * var(--img, 1) * (1 - var(--img, 1))); pointer-events: none; }
+.banner--flip .banner__media::after { left: auto; right: calc(var(--img, 1) * 100% - 4px); }
+/* заголовок по буквам: каждая поднимается из-под маски со своей задержкой */
+.banner__title { overflow: hidden; padding-bottom: .14em; }
+.banner__title .l { display: inline-block; transform-origin: 0 100%;
+  --lp: clamp(0, calc((var(--title, 1) - var(--i, 0) * .075) / .42), 1);
+  transform: translate3d(0, calc((1 - var(--lp)) * (1 - var(--lp)) * 110%), 0) rotate(calc((1 - var(--lp)) * 9deg)); opacity: var(--lp); }
+.banner__title::after { content: ''; display: block; width: calc(var(--title, 1) * 72px); height: 4px; margin-top: 14px; border-radius: 2px; background: var(--violet-hi); }
+.banner__text { opacity: var(--text, 1); transform: translate3d(0, calc((1 - var(--text, 1)) * 26px), 0); }
+.banner__actions { opacity: min(1, var(--btn, 1)); transform: scale(calc(.8 + .2 * var(--btn, 1))); transform-origin: 0 50%; }
+@media (max-width: 1020px) {
+  .banner--flip .banner__media { clip-path: inset(0 calc((1 - var(--img, 1)) * 100%) 0 0); }
+  .banner--flip .banner__media::after { right: auto; left: calc(var(--img, 1) * 100% - 4px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .banner, .banner__media, .banner--flip .banner__media, .banner__title .l, .banner__text, .banner__actions { opacity: 1; transform: none; clip-path: none; }
+  .banner__media::after { display: none; }
+  .banner__title::after { width: 72px; }
+}
+
 /* ---------- Окно «Играть сейчас» ---------- */
 .modal { width: 100%; max-width: min(480px, calc(100% - 32px)); margin: auto; padding: 0; border: 0; background: transparent; color: inherit; overflow: visible; }
 .modal::backdrop { background: rgba(10, 6, 16, .78); backdrop-filter: blur(4px); }

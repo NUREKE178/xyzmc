@@ -80,7 +80,7 @@
     <article class="banner banner--${esc(b.tone || 'violet')}${i % 2 ? ' banner--flip' : ''}" data-id="${esc(b.id)}">
       <div class="banner__media"><img src="${esc(b.image)}" alt="" loading="lazy" width="720" height="540"></div>
       <div class="banner__body">
-        <h3 class="banner__title">${esc(b.title)}</h3>
+        <h3 class="banner__title" aria-label="${esc(b.title)}">${[...String(b.title)].map((ch, k) => (ch === ' ' ? ' ' : `<span class="l" style="--i:${k}" aria-hidden="true">${esc(ch)}</span>`)).join('')}</h3>
         <p class="banner__text">${esc(b.text)}</p>
         <div class="banner__actions">${buttons.map((x, k) => `<a class="btn${buttons.length > 1 && k ? ' btn--secondary' : ''}" href="${esc(x.href)}"${extAttrs(x.href)}>${label(x.label, x.icon)}</a>`).join('')}</div>
       </div>
@@ -334,44 +334,49 @@
     el.classList.add('in');
     setTimeout(() => { el.removeAttribute('data-anim'); el.classList.remove('in'); }, 1600);   // дальше — обычное состояние (hover и т. д.)
   });
-  /* Баннеры «Магазин» и «Соцсети»: блок «поднимается» — наклон в 3D → ровно, рост 90% → 100%, проявление; затем по очереди
-     появляются заголовок, текст и кнопка. Движение привязано к прокрутке (вниз — собирается, вверх — разбирается),
-     у каждого блока своё, зависит только от его положения. Только transform и opacity — всё считает видеокарта. */
+  /* Баннеры «Магазин» и «Соцсети» — «кинематографичное» появление, привязанное к прокрутке (вниз — собирается, вверх — разбирается):
+       1) рамка блока выплывает снизу;
+       2) светлая линия «открывает» картинку шторкой (сама картинка не двигается);
+       3) заголовок собирается по буквам из-под маски, под ним вырастает подчёркивание;
+       4) проявляется описание;
+       5) кнопка «выпрыгивает» с лёгкой пружиной.
+     JS только считает прогресс этапов и кладёт его в CSS-переменные (--card, --img, --title, --text, --btn),
+     а всё движение описано в CSS (transform / opacity / clip-path). У каждого блока прогресс свой. */
   let bannersBound = false;
   function initBannerScroll() {
     if (bannersBound || reduceMotion) return;
-    const banners = $$('.banner').map((el) => ({
-      el, flip: el.classList.contains('banner--flip'),
-      parts: [$('.banner__title', el), $('.banner__text', el), $('.banner__actions', el)].filter(Boolean),
-    }));
+    const banners = $$('.banner');
     if (!banners.length) return;
     bannersBound = true;
     const clamp = (v) => Math.min(1, Math.max(0, v));
-    const ease = (t) => 1 - Math.pow(1 - t, 3);                  // easeOutCubic
+    const outCubic = (t) => 1 - Math.pow(1 - t, 3);
+    const inOutCubic = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+    const outBack = (t) => { const c = 1.9; return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2); };
+    const VARS = ['--card', '--img', '--title', '--text', '--btn'];
     let queued = false;
 
     const update = () => {
       queued = false;
       const vh = innerHeight;
-      for (const b of banners) {
-        const r = b.el.getBoundingClientRect();
-        // 0 — верх блока чуть выше нижнего края экрана; 1 — блок почти целиком виден
-        const p = clamp((vh * 0.92 - r.top) / (Math.min(r.height, vh) * 0.8 + vh * 0.1));
-        const f = ease(clamp(p / 0.62));
-        const animating = p > 0 && p < 1;
-        b.el.style.willChange = animating ? 'transform, opacity' : 'auto';          // слой держим только пока идёт анимация
-        b.el.style.opacity = p >= 1 ? '' : clamp(p / 0.3).toFixed(3);
-        b.el.style.transform = f >= 1 ? '' :
-          `perspective(1400px) translate3d(0,${((1 - f) * 90).toFixed(1)}px,0) rotateX(${((1 - f) * 16).toFixed(2)}deg) rotateY(${((b.flip ? 1 : -1) * (1 - f) * 8).toFixed(2)}deg) scale(${(0.88 + 0.12 * f).toFixed(4)})`;
-        b.parts.forEach((node, i) => {
-          const local = clamp((p - 0.24 - i * 0.1) / 0.4);
-          node.style.opacity = local >= 1 ? '' : local.toFixed(3);
-          node.style.transform = local >= 1 ? '' : `translate3d(0,${((1 - ease(local)) * 34).toFixed(1)}px,0)`;
-        });
+      for (const el of banners) {
+        // меряем неподвижную обёртку: сам блок во время анимации смещается, и прогресс зависел бы от собственного движения
+        const r = el.parentElement.getBoundingClientRect();
+        // 0 — верх блока чуть выше нижнего края экрана; 1 — блок поднялся до ~38% высоты экрана (виден целиком с запасом)
+        const p = clamp((vh * 0.94 - r.top) / (vh * 0.56));
+        if (p >= 1) {                                               // готово: убираем переменные, остаётся конечное состояние из CSS
+          if (el.dataset.stage !== 'done') { VARS.forEach((v) => el.style.removeProperty(v)); el.style.willChange = 'auto'; el.dataset.stage = 'done'; }
+          continue;
+        }
+        el.dataset.stage = 'run';
+        el.style.willChange = 'transform, opacity';
+        el.style.setProperty('--card', outCubic(clamp(p / 0.25)).toFixed(4));
+        el.style.setProperty('--img', inOutCubic(clamp((p - 0.05) / 0.5)).toFixed(4));
+        el.style.setProperty('--title', clamp((p - 0.28) / 0.44).toFixed(4));
+        el.style.setProperty('--text', outCubic(clamp((p - 0.55) / 0.3)).toFixed(4));
+        el.style.setProperty('--btn', outBack(clamp((p - 0.68) / 0.32)).toFixed(4));
       }
     };
     const schedule = () => { if (!queued) { queued = true; requestAnimationFrame(update); } };
-    banners.forEach((b) => { b.el.style.transformOrigin = '50% 90%'; });
     addEventListener('scroll', schedule, { passive: true });
     addEventListener('resize', schedule);
     addEventListener('load', schedule);
