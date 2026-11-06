@@ -45,7 +45,7 @@ http.createServer((req, res) => {
   if (rel.includes('\0')) { res.writeHead(400); return res.end(); }
   if (rel.startsWith('/uploads/')) return serveFile(req, res, path.join(UPLOAD_DIR, path.basename(rel)));
 
-  const target = path.normalize(path.join(PUBLIC, rel === '/' ? 'index.html' : rel));
+  const target = path.normalize(path.join(PUBLIC, rel === '/' ? 'index.html' : rel.endsWith('/') ? rel + 'index.html' : rel));
   if (!target.startsWith(PUBLIC + path.sep)) { res.writeHead(403); return res.end(); }   // защита от ../
   serveFile(req, res, target);
 }).listen(PORT, () => console.log(`XYZ: http://localhost:${PORT}  (админка: /admin.html)`));
